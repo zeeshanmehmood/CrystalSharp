@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <Title>CrystalSharp.Oracle</Title>
+    <Authors>Zeeshan Mehmood</Authors>
+    <Company>Zeeshan Mehmood</Company>
+    <Copyright>Copyright (c) Zeeshan Mehmood 2024</Copyright>
+    <Description>Oracle persistence with Entity Framework Core support for Crystal Sharp.</Description>
+    <PackageTags>DDD CQRS ES event sourcing Oracle EF Entity Framework Core</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="6.21.140" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="7.21.13" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.21.140" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalSharp.EntityFrameworkCore.Common\CrystalSharp.EntityFrameworkCore.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
+  </ItemGroup>
+
+</Project>

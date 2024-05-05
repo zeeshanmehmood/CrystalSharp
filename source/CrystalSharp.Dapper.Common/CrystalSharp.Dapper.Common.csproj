@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <Title>CrystalSharp</Title>
+    <Authors>Zeeshan Mehmood</Authors>
+    <Company>Zeeshan Mehmood</Company>
+    <Copyright>Copyright (c) Zeeshan Mehmood 2024</Copyright>
+    <Description>Provides support for database queries.</Description>
+    <PackageTags>DDD CQRS ES event sourcing</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
+  </ItemGroup>
+
+</Project>
