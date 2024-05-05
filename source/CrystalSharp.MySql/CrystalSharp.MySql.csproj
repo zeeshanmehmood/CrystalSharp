@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <Title>CrystalSharp.MySql</Title>
+    <Authors>Zeeshan Mehmood</Authors>
+    <Company>Zeeshan Mehmood</Company>
+    <Copyright>Copyright (c) Zeeshan Mehmood 2024</Copyright>
+    <Description>MySQL persistence with Entity Framework Core support for Crystal Sharp.</Description>
+    <PackageTags>DDD CQRS ES event sourcing MySQL EF Entity Framework Core</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\Script0001 - Create table EventStore.sql" />
+    <None Remove="Scripts\Script0002 - Create table SnapshotStore.sql" />
+    <None Remove="Scripts\Script0003 - Create table SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\Script0001 - Create table EventStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0002 - Create table SnapshotStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0003 - Create table SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-mysql" Version="5.0.44" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MySql.Data" Version="8.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalSharp.Dapper.Common\CrystalSharp.Dapper.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp.EntityFrameworkCore.Common\CrystalSharp.EntityFrameworkCore.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Sql.Common\CrystalSharp.Sql.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
+  </ItemGroup>
+
+</Project>

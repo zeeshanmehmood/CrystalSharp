@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.29">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.18">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalSharp.MsSql\CrystalSharp.MsSql.csproj" />
+    <ProjectReference Include="..\CrystalSharp.MySql\CrystalSharp.MySql.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Oracle\CrystalSharp.Oracle.csproj" />
+    <ProjectReference Include="..\CrystalSharp.PostgreSql\CrystalSharp.PostgreSql.csproj" />
+    <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
+    <ProjectReference Include="..\CrystalSharp.EventStores.EventStoreDb\CrystalSharp.EventStores.EventStoreDb.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Messaging.AzureServiceBus\CrystalSharp.Messaging.AzureServiceBus.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Messaging.RabbitMq\CrystalSharp.Messaging.RabbitMq.csproj" />
+    <ProjectReference Include="..\CrystalSharp.MongoDb\CrystalSharp.MongoDb.csproj" />
+    <ProjectReference Include="..\CrystalSharp.RavenDb\CrystalSharp.RavenDb.csproj" />
+    <ProjectReference Include="..\CrystalSharp.ReadModelStores.Elasticsearch\CrystalSharp.ReadModelStores.Elasticsearch.csproj" />
+  </ItemGroup>
+
+</Project>
