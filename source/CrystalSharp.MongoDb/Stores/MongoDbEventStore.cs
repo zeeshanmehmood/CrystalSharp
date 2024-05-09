@@ -148,13 +148,16 @@ namespace CrystalSharp.MongoDb.Stores
         {
             FilterDefinition<EventStoreData> filter = Builders<EventStoreData>.Filter
                 .And(PrepareEntityStatusFilter(), PrepareStreamNameFilter(stream));
-            EventStoreData existingRecord = _documentCollection.Find(filter).FirstOrDefault();
+            IList<EventStoreData> existingRecords = _documentCollection.Find(filter).ToList();
 
-            if (existingRecord != null)
+            if (existingRecords.HasAny())
             {
-                existingRecord.EntityStatus = 0;
+                foreach (EventStoreData existingRecord in existingRecords)
+                {
+                    existingRecord.EntityStatus = 0;
 
-                await _documentCollection.FindOneAndReplaceAsync(filter, existingRecord, null, cancellationToken).ConfigureAwait(false);
+                    await _documentCollection.FindOneAndReplaceAsync(filter, existingRecord, null, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
 

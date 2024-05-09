@@ -48,6 +48,7 @@ namespace CrystalSharp.Infrastructure.ReadModelStoresPersistence
         Task<bool> BulkRestore<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<bool> BulkRestore<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<long> Count<T>(RecordMode recordMode = RecordMode.Active, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<T> Find<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<PagedResult<T>> Get<T>(int skip = 0,
