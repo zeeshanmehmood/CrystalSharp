@@ -188,6 +188,14 @@ namespace CrystalSharp.ReadModelStores.Elasticsearch
             return response;
         }
 
+        public virtual async Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            await Task.CompletedTask;
+
+            throw new NotImplementedException("Not implemented.");
+        }
+
         public async Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {

@@ -194,6 +194,14 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             return totalCount;
         }
 
+        public virtual async Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            long totalCount = await _dbContext.Set<T>().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+
+            return totalCount;
+        }
+
         public virtual async Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
@@ -415,12 +423,29 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         {
             await Task.CompletedTask;
 
+            long totalRecords = 0;
+            Expression<Func<T, bool>> recordModePredicate;
+
+            if (recordMode == RecordMode.Active)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Active;
+            }
+            else if (recordMode == RecordMode.SoftDeleted)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Deleted;
+            }
+            else
+            {
+                recordModePredicate = x => true;
+            }
+
+            totalRecords = _dbContext.Set<T>().Where(predicate).Where(recordModePredicate).LongCount();
             IQueryable<T> records = _dbContext.Get<T, TKey>(skip, take, predicate, recordMode, sortColumn, sortMode);
             PagedResult<T> result = null;
 
-            if (records != null && records.Any())
+            if (records.HasAny())
             {
-                result = new PagedResult<T>(skip, take, records.Count(), records);
+                result = new PagedResult<T>(skip, take, totalRecords, records);
             }
 
             return result;

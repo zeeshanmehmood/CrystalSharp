@@ -164,6 +164,15 @@ namespace CrystalSharp.MongoDb.Stores
             return await documentCollection.CountDocumentsAsync(GenerateEntityStatusFilter<T>(recordMode), null, cancellationToken).ConfigureAwait(false);
         }
 
+        public virtual async Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<string>
+        {
+            IMongoCollection<T> documentCollection = GetCollection<T>();
+            long totalCount = await documentCollection.AsQueryable().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+
+            return totalCount;
+        }
+
         public async Task<T> Find<T>(string id, CancellationToken cancellationToken = default)
             where T : class, IReadModel<string>
         {
@@ -407,13 +416,30 @@ namespace CrystalSharp.MongoDb.Stores
         {
             await Task.CompletedTask;
 
+            long totalRecords = 0;
+            Expression<Func<T, bool>> recordModePredicate;
+
+            if (recordMode == RecordMode.Active)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Active;
+            }
+            else if (recordMode == RecordMode.SoftDeleted)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Deleted;
+            }
+            else
+            {
+                recordModePredicate = x => true;
+            }
+
             IMongoCollection<T> documentCollection = GetCollection<T>();
+            totalRecords = documentCollection.AsQueryable().Where(predicate).Where(recordModePredicate).LongCount();
             IQueryable<T> records = documentCollection.Get<T, string>(skip, take, predicate, recordMode, sortColumn, sortMode);
             PagedResult<T> result = null;
 
-            if (records != null && records.Any())
+            if (records.HasAny())
             {
-                result = new PagedResult<T>(skip, take, records.Count(), records);
+                result = new PagedResult<T>(skip, take, totalRecords, records);
             }
 
             return result;
