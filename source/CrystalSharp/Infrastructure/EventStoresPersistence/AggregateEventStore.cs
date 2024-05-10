@@ -203,6 +203,21 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             aggregate.MarkEventsAsCommitted();
         }
 
+        public async Task Delete<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default)
+            where TAggregate : IAggregateRoot<TKey>
+        {
+            IReadOnlyList<IDomainEvent> domainEvents = aggregate.UncommittedEvents();
+
+            await Delete<TAggregate>(aggregate.GlobalUId, cancellationToken).ConfigureAwait(false);
+
+            if (domainEvents.HasAny())
+            {
+                await _eventDispatcher.Dispatch(domainEvents, cancellationToken).ConfigureAwait(false);
+            }
+
+            aggregate.MarkEventsAsCommitted();
+        }
+
         public async Task Delete<TAggregate>(Guid streamId, CancellationToken cancellationToken = default)
             where TAggregate : IAggregateRoot<TKey>
         {

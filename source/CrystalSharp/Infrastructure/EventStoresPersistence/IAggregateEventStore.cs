@@ -37,6 +37,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             where TAggregate : IAggregateRoot<TKey>;
         Task Store<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default)
             where TAggregate : IAggregateRoot<TKey>;
+        Task Delete<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default)
+            where TAggregate : IAggregateRoot<TKey>;
         Task Delete<TAggregate>(Guid streamId, CancellationToken cancellationToken = default)
             where TAggregate : IAggregateRoot<TKey>;
     }
