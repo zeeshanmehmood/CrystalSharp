@@ -7,14 +7,14 @@ Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.
 ### Contact
 For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)
 
-
+<br/>
 # Code Examples
 
 ### CQRS
 
 [CQRS Example](https://github.com/zeeshanmehmood/crystalsharp-cqrs-example) - CQRS usage example.
 
-
+<br/>
 ### Domain-driven Design and Database Integration
 
 [Domain-driven Design and Microsoft SQL Server integration](https://github.com/zeeshanmehmood/crystalsharp-ddd-sqlserver-integration-example) - Domain-driven Design (DDD) and Microsoft SQL Server integration example.
