@@ -2,6 +2,13 @@
 <img align="right" alt="Crystal Sharp" src="https://github.com/zeeshanmehmood/CrystalSharp/blob/main/assets/icon/icon-128x128.png?raw=true" />
 Crystal Sharp is a framework that facilitates the creation of business applications, microservices, Web APIs, Web apps, and small apps. It offers features like CQRS, Domain-driven design (DDD), event sourcing, read model stores, sagas, distributed messaging, and data storage for both RDBMS and NoSQL. The Crystal Sharp framework is designed to make application development easier and faster. The Crystal Sharp framework is entirely asynchronous and written in C#.
 
+### .NET Versions
+Currently, following .NET versions are supported by Crystal Sharp framework:
+
+* `.NET 6`
+* `.NET 7`
+* `.NET 8`
+
 ### Documentation
 Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.io).
 
