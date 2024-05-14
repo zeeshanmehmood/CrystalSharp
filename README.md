@@ -12,6 +12,9 @@ Currently, following .NET versions are supported by Crystal Sharp framework:
 ### Documentation
 Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.io).
 
+### Donations and Support
+To help fund the development of Crystal Sharp through donations and financial support, please contact: [info@crystalsharp.io](mailto:info@crystalsharp.io)
+
 ### Contact
 For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)
 
