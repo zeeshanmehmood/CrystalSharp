@@ -5,9 +5,8 @@ Crystal Sharp is a framework that facilitates the creation of business applicati
 Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.io).
 
 ### Contact
-For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)
+For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)  
 
-<br>
 # Code Examples
 
 ### CQRS
