@@ -20,6 +20,9 @@ For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.
 * Sagas and transactions are well-backed, offering reliable features. Sagas can be implemented by using either the choreography or orchestration approach.
 * Seamlessly communicate across distributed systems using Azure Service Bus and RabbitMQ messaging capabilities.
 
+### Branches
+* `develop-v1` - Development branch, submit pull requests to this branch.
+
 &nbsp;
 # Code Examples
 
