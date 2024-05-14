@@ -14,7 +14,7 @@ For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.
 
 [CQRS Example](https://github.com/zeeshanmehmood/crystalsharp-cqrs-example) - CQRS usage example.
 
-<br>
+&nbsp;
 ### Domain-driven Design and Database Integration
 
 [Domain-driven Design and Microsoft SQL Server integration](https://github.com/zeeshanmehmood/crystalsharp-ddd-sqlserver-integration-example) - Domain-driven Design (DDD) and Microsoft SQL Server integration example.
@@ -27,7 +27,7 @@ For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.
 
 [Domain-driven Design and RavenDB integration](https://github.com/zeeshanmehmood/crystalsharp-ddd-ravendb-integration-example) - Domain-driven Design (DDD) and RavenDB integration example.
 
-
+&nbsp;
 ### Event Store
 
 [Event Store integration with EventStoreDB](https://github.com/zeeshanmehmood/crystalsharp-eventstoredb-integration-example) - Event Store integration example with EventStoreDB.
@@ -40,14 +40,14 @@ For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.
 
 [Event Store integration with MongoDB](https://github.com/zeeshanmehmood/crystalsharp-eventstore-mongodb-integration-example) - Event Store integration example with MongoDB.
 
-
+&nbsp;
 ### Read Model Store
 
 [Read Model Store integration with Microsoft SQL Server](https://github.com/zeeshanmehmood/crystalsharp-readmodelstore-sqlserver-integration-example) - Read Model Store integration example with Microsoft SQL Server.
 
 [Read Model Store integration with MongoDB](https://github.com/zeeshanmehmood/crystalsharp-readmodelstore-mongodb-integration-example) - Read Model Store integration example with MongoDB.
 
-
+&nbsp;
 ### Sagas
 
 [Saga Choreography with Microsoft SQL Server](https://github.com/zeeshanmehmood/crystalsharp-saga-choreography-sqlserver-example) - Saga Choreography example with Microsoft SQL Server.
@@ -56,7 +56,7 @@ For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.
 
 [Saga Orchestration with PostgreSQL](https://github.com/zeeshanmehmood/crystalsharp-saga-orchestration-postgresql-example) - Saga Orchestration example with PostgreSQL.
 
-
+&nbsp;
 ### Message Broker
 
 [Message Broker with RabbitMQ](https://github.com/zeeshanmehmood/crystalsharp-messagebroker-rabbitmq-example) - Message Broker example with RabbitMQ.
