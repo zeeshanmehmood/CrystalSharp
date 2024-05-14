@@ -6,7 +6,19 @@ Crystal Sharp is a framework that facilitates the creation of business applicati
 Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.io).
 
 ### Contact
-For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)  
+For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)
+
+### Salient Features
+* Offers a clean and efficient approach for developing business applications, microservices, Web APIs, Web apps, and small apps.
+* Easy to setup and use.
+* Fluent configuration API.
+* CQRS - Commands, Queries and Notifications.
+* Domain-driven Design (DDD).
+* Supports a wide range of databases, including RDBMS like Microsoft SQL Server, Oracle, PostgreSQL, and MySQL, and NoSQL databases such as MongoDB and RavenDB.
+* Event Sourcing is well-supported through the use of native EventStoreDB as well as RDBMS options like SQL Server, PostgreSQL, MySQL, and NoSQL databases such as MongoDB.
+* Read Model Store - Offers efficient storage of flat and optimized data, supporting RDBMS such as SQL Server, Oracle, PostgreSQL, and MySQL, as well as NoSQL options like Elasticsearch and MongoDB.
+* Sagas and transactions are well-backed, offering reliable features. Sagas can be implemented by using either the choreography or orchestration approach.
+* Seamlessly communicate across distributed systems using Azure Service Bus and RabbitMQ messaging capabilities.
 
 &nbsp;
 # Code Examples
