@@ -7,7 +7,7 @@ Take a look at the comprehensive [documentation](https://crystalsharp.docwriter.
 ### Contact
 For suggestions, bugs, and other inquiries, please write to: [info@crystalsharp.io](mailto:info@crystalsharp.io)  
 
-`<br>`
+-
 # Code Examples
 
 ### CQRS
