@@ -67,9 +67,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Extensions
             {
                 records = (sortMode == DataSortMode.Ascending) 
                     ?
-                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take).OrderBy(sortColumn)
+                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderBy(sortColumn).Skip(skip).Take(take)
                     :
-                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take).OrderByDescending(sortColumn);
+                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderByDescending(sortColumn).Skip(skip).Take(take);
             }
 
             return records;
