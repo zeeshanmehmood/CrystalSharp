@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <Title>CrystalSharp</Title>
+    <Title>CrystalSharp.Dapper.Common</Title>
     <Authors>Zeeshan Mehmood</Authors>
     <Company>Zeeshan Mehmood</Company>
     <Copyright>Copyright (c) Zeeshan Mehmood 2024</Copyright>

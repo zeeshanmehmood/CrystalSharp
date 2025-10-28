@@ -74,9 +74,9 @@ namespace CrystalSharp.MongoDb.Extensions
             {
                 records = (sortMode == DataSortMode.Ascending)
                     ?
-                    dbCollection.AsQueryable<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take).OrderBy(sortColumn)
+                    dbCollection.AsQueryable<T>().Where(entityStatusPredicate).Where(predicate).OrderBy(sortColumn).Skip(skip).Take(take)
                     :
-                    dbCollection.AsQueryable<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take).OrderByDescending(sortColumn);
+                    dbCollection.AsQueryable<T>().Where(entityStatusPredicate).Where(predicate).OrderByDescending(sortColumn).Skip(skip).Take(take);
             }
 
             return records;

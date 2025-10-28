@@ -419,6 +419,11 @@ namespace CrystalSharp.MongoDb.Stores
             long totalRecords = 0;
             Expression<Func<T, bool>> recordModePredicate;
 
+            if (predicate == null)
+            {
+                predicate = x => true;
+            }
+
             if (recordMode == RecordMode.Active)
             {
                 recordModePredicate = x => x.EntityStatus == EntityStatus.Active;
