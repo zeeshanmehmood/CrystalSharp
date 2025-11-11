@@ -37,6 +37,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Extensions
             int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None)
@@ -61,16 +62,56 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Extensions
 
             if (sortMode == DataSortMode.None)
             {
-                records = dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take);
+                records = tracking
+                    ?
+                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take)
+                    :
+                    dbContext.Set<T>().AsNoTracking().Where(entityStatusPredicate).Where(predicate).Skip(skip).Take(take);
             }
             else
             {
-                records = (sortMode == DataSortMode.Ascending) 
+                records = (sortMode == DataSortMode.Ascending)
                     ?
-                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderBy(sortColumn).Skip(skip).Take(take)
+                    GetAscending<T, TKey>(dbContext, tracking, entityStatusPredicate, predicate, sortColumn, skip, take)
                     :
-                    dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderByDescending(sortColumn).Skip(skip).Take(take);
+                    GetDescending<T, TKey>(dbContext, tracking, entityStatusPredicate, predicate, sortColumn, skip, take);
             }
+
+            return records;
+        }
+
+        private static IQueryable<T> GetAscending<T, TKey>(DbContext dbContext,
+            bool tracking,
+            Expression<Func<T, bool>> entityStatusPredicate,
+            Expression<Func<T, bool>> predicate,
+            string sortColumn,
+            int skip,
+            int take)
+            where T : class, IReadModel<TKey>
+        {
+            IQueryable<T> records = tracking
+                ?
+                dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderBy(sortColumn).Skip(skip).Take(take)
+                :
+                dbContext.Set<T>().AsNoTracking().Where(entityStatusPredicate).Where(predicate).OrderBy(sortColumn).Skip(skip).Take(take);
+
+            return records;
+        }
+
+        private static IQueryable<T> GetDescending<T, TKey>(DbContext dbContext,
+            bool tracking,
+            Expression<Func<T, bool>> entityStatusPredicate,
+            Expression<Func<T, bool>> predicate,
+            string sortColumn,
+            int skip,
+            int take)
+            where T : class, IReadModel<TKey>
+        {
+            IQueryable<T> records = tracking
+                ?
+                dbContext.Set<T>().Where(entityStatusPredicate).Where(predicate).OrderByDescending(sortColumn).Skip(skip).Take(take)
+                :
+                dbContext.Set<T>().AsNoTracking().Where(entityStatusPredicate).Where(predicate).OrderByDescending(sortColumn).Skip(skip).Take(take);
 
             return records;
         }

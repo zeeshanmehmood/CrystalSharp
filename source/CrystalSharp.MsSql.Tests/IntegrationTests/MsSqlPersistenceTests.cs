@@ -27,9 +27,11 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Common.Utilities;
 using CrystalSharp.Domain;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.MsSql.Aggregates.CurrencyAggregate;
+using CrystalSharp.Tests.Common.MsSql.Aggregates.InvoiceAggregate;
 using CrystalSharp.Tests.Common.MsSql.Infrastructure;
 
 namespace CrystalSharp.MsSql.Tests.IntegrationTests
@@ -137,6 +139,36 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
 
             // Assert
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task Invoice_and_line_items_saved()
+        {
+            // Arrange
+            IMsSqlDataContext sut = _testFixture.DataContext;
+            string invoiceCode = $"INV-{RandomGenerator.GenerateNumber()}";
+            Invoice invoice = Invoice.Create(invoiceCode);
+            invoice.AddLineItem("Headset", 2, 20.25M);
+            invoice.AddLineItem("Mousepad", 5, 5);
+            invoice.AddLineItem("Keyboard", 2, 73.52M);
+            decimal amount = invoice.TotalAmount;
+            invoice.Validate();
+            await sut.Invoice.AddAsync(invoice, CancellationToken.None).ConfigureAwait(false);
+
+            // Act
+            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            Invoice result = await sut.Invoice
+                .Include(x => x.LineItems)
+                .SingleOrDefaultAsync(y => y.GlobalUId == invoice.GlobalUId, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Code.Should().Be(invoiceCode);
+                result.LineItems.Should().HaveCount(invoice.LineItems.Count);
+                result.TotalAmount.Should().Be(amount);
+            }
         }
     }
 }

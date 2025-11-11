@@ -24,12 +24,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.Tests.Common.MySql.Aggregates.SupplierAggregate;
+using CrystalSharp.Tests.Common.MySql.Aggregates.PurchaseOrderAggregate;
 
 namespace CrystalSharp.Tests.Common.MySql.Infrastructure
 {
     public interface IMySqlDataContext
     {
         DbSet<Supplier> Supplier { get; set; }
+        DbSet<PurchaseOrder> PurchaseOrder { get; set; }
+        DbSet<OrderItem> OrderItem { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

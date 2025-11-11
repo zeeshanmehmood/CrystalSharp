@@ -50,7 +50,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         {
             await _dbContext.Set<T>().AddAsync(record, cancellationToken).ConfigureAwait(false);
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -62,7 +64,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
 
             await _dbContext.Set<T>().AddRangeAsync(records, cancellationToken).ConfigureAwait(false);
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -72,7 +76,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         {
             _dbContext.Set<T>().Update(record);
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -189,7 +195,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             where T : class, IReadModel<TKey>
         {
             Expression<Func<T, bool>> predicate = GenerateEntityStatusPredicate<T>(recordMode);
-            long totalCount = await _dbContext.Set<T>().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+            long totalCount = await _dbContext.Set<T>().AsNoTracking().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
 
             return totalCount;
         }
@@ -197,39 +203,57 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         public virtual async Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
-            long totalCount = await _dbContext.Set<T>().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+            long totalCount = await _dbContext.Set<T>().AsNoTracking().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
 
             return totalCount;
         }
 
-        public virtual async Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default)
+        public virtual async Task<T> Find<T>(TKey id, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
             Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, TKey>(id);
-            T existing = await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            T existing = tracking
+                ?
+                await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)
+                :
+                await _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            return existing;
+        }
+
+        public virtual async Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, Guid>(globalUId);
+            T existing = tracking
+                ?
+                await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)
+                :
+                await _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
 
             return existing;
         }
 
-        public virtual async Task<T> Find<T>(Guid globalUId, CancellationToken cancellationToken = default)
+        public virtual async Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
-            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, Guid>(globalUId);
-            T existing = await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            await Task.CompletedTask;
 
-            return existing;
+            IQueryable<T> records = tracking ? _dbContext.Set<T>().Where(predicate) : _dbContext.Set<T>().AsNoTracking().Where(predicate);
+
+            return records;
         }
 
         public virtual async Task<PagedResult<T>> Get<T>(int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
             CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
-            PagedResult<T> result = await GetRecords(skip, take, predicate, recordMode, sortColumn, sortMode, cancellationToken).ConfigureAwait(false);
+            PagedResult<T> result = await GetRecords(skip, take, predicate, tracking, recordMode, sortColumn, sortMode, cancellationToken).ConfigureAwait(false);
 
             return result;
         }
@@ -238,6 +262,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             bool useWildcard,
             int skip = 0,
             int take = 10,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
@@ -292,7 +317,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
 
             _dbContext.Set<T>().Remove(existing);
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -306,7 +333,10 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             if (existing == null) return false;
 
             existing.EntityStatus = EntityStatus.Deleted;
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -333,7 +363,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
 
             _dbContext.RemoveRange(existingRecords);
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -363,7 +395,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 record.EntityStatus = EntityStatus.Deleted;
             }
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -407,7 +441,9 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 record.EntityStatus = EntityStatus.Active;
             }
 
-            int affected = await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
 
             return affected > 0;
         }
@@ -415,6 +451,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         private async Task<PagedResult<T>> GetRecords<T>(int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
@@ -444,8 +481,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 recordModePredicate = x => true;
             }
 
-            totalRecords = _dbContext.Set<T>().Where(predicate).Where(recordModePredicate).LongCount();
-            IQueryable<T> records = _dbContext.Get<T, TKey>(skip, take, predicate, recordMode, sortColumn, sortMode);
+            totalRecords = _dbContext.Set<T>().AsNoTracking().Where(predicate).Where(recordModePredicate).LongCount();
+            IQueryable<T> records = _dbContext.Get<T, TKey>(skip, take, predicate, tracking, recordMode, sortColumn, sortMode);
             PagedResult<T> result = null;
 
             if (records.HasAny())
@@ -481,7 +518,16 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
         {
             DateTraction(dbContext);
 
-            int affected = await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(dbContext);
+
+            return affected;
+        }
+
+        private int GetAffected(TDbContext dbContext)
+        {
+            int affected = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IReadModel<TKey>).Count();
 
             return affected;
         }

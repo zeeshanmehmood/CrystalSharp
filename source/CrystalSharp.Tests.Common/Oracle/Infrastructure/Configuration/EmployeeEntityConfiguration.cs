@@ -30,14 +30,14 @@ namespace CrystalSharp.Tests.Common.Oracle.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
-            builder.Property(x => x.Id).HasColumnName("ID");
-            builder.Property(x => x.GlobalUId).HasColumnName("GLOBALUID");
-            builder.Property(x => x.EntityStatus).HasColumnName("ENTITYSTATUS");
-            builder.Property(x => x.CreatedOn).HasColumnName("CREATEDON");
-            builder.Property(x => x.ModifiedOn).HasColumnName("MODIFIEDON");
-            builder.Property(x => x.Version).HasColumnName("VERSION");
-            builder.Property(x => x.Name).HasColumnName("NAME");
-            builder.Property(x => x.Code).HasColumnName("CODE");
+            builder.Property(x => x.Id).HasColumnName(nameof(Employee.Id).ToUpper());
+            builder.Property(x => x.GlobalUId).HasColumnName(nameof(Employee.GlobalUId).ToUpper());
+            builder.Property(x => x.EntityStatus).HasColumnName(nameof(Employee.EntityStatus).ToUpper());
+            builder.Property(x => x.CreatedOn).HasColumnName(nameof(Employee.CreatedOn).ToUpper());
+            builder.Property(x => x.ModifiedOn).HasColumnName(nameof(Employee.ModifiedOn).ToUpper());
+            builder.Property(x => x.Version).HasColumnName(nameof(Employee.Version).ToUpper());
+            builder.Property(x => x.Name).HasColumnName(nameof(Employee.Name).ToUpper());
+            builder.Property(x => x.Code).HasColumnName(nameof(Employee.Code).ToUpper());
         }
     }
 }

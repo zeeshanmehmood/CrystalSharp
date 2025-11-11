@@ -27,9 +27,11 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Common.Utilities;
 using CrystalSharp.Domain;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.Oracle.Aggregates.EmployeeAggregate;
+using CrystalSharp.Tests.Common.Oracle.Aggregates.SaleOrderAggregate;
 using CrystalSharp.Tests.Common.Oracle.Infrastructure;
 
 namespace CrystalSharp.Oracle.Tests.IntegrationTests
@@ -134,6 +136,36 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
 
             // Assert
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task Sale_order_and_order_details_saved()
+        {
+            // Arrange
+            IOracleDataContext sut = _testFixture.DataContext;
+            string saleOrderCode = $"SALE-ORDER-{RandomGenerator.GenerateNumber()}";
+            SaleOrder saleOrder = SaleOrder.Create(saleOrderCode);
+            saleOrder.AddOrderDetail("Headset", 2, 20.25M);
+            saleOrder.AddOrderDetail("Mousepad", 5, 5);
+            saleOrder.AddOrderDetail("Keyboard", 2, 73.52M);
+            decimal amount = saleOrder.TotalAmount;
+            saleOrder.Validate();
+            await sut.SaleOrder.AddAsync(saleOrder, CancellationToken.None).ConfigureAwait(false);
+
+            // Act
+            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            SaleOrder result = await sut.SaleOrder
+                .Include(x => x.Orders)
+                .SingleOrDefaultAsync(y => y.GlobalUId == saleOrder.GlobalUId, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Code.Should().Be(saleOrderCode);
+                result.Orders.Should().HaveCount(saleOrder.Orders.Count);
+                result.TotalAmount.Should().Be(amount);
+            }
         }
     }
 }

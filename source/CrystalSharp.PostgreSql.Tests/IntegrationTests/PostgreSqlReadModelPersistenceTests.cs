@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Domain;
 using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
@@ -358,6 +359,30 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task Filter_read_model_by_predicate()
+        {
+            // Arrange
+            IReadModelStore<int> sut = _testFixture.ReadModelStore;
+            DepartmentReadModel salesAudit = DepartmentReadModel.Create("Audit - Sales", "AUDIT-SALES");
+            DepartmentReadModel financeAudit = DepartmentReadModel.Create("Audit - Finance", "AUDIT-FINANCE");
+            IList<DepartmentReadModel> departments = new List<DepartmentReadModel> { salesAudit, financeAudit };
+            await sut.BulkStore<DepartmentReadModel>(departments, CancellationToken.None).ConfigureAwait(false);
+            Expression<Func<DepartmentReadModel, bool>> predicate = x => x.Name.StartsWith("Audit") && x.EntityStatus == EntityStatus.Active;
+
+            // Act
+            IQueryable<DepartmentReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Should().NotBeNull();
+                result.Count().Should().Be(2);
+                result.SingleOrDefault(x => x.Name == salesAudit.Name).Should().NotBeNull();
+                result.SingleOrDefault(x => x.Name == financeAudit.Name).Should().NotBeNull();
+            }
+        }
+
+        [Fact]
         public async Task Get_all_records()
         {
             // Arrange
@@ -394,7 +419,7 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
 
             // Act
-            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10, predicate, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10, predicate, false, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

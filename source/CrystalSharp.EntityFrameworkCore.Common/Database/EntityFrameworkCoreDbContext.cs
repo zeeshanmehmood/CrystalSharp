@@ -25,6 +25,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using CrystalSharp.Common.Extensions;
 using CrystalSharp.Domain;
 using CrystalSharp.Domain.EventDispatching;
@@ -45,23 +46,27 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Database
         public async Task<int> SaveChanges<TDbContext>(TDbContext dbContext, CancellationToken cancellationToken = default)
             where TDbContext : DbContext
         {
-            var afftectedEntries = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IHasSecondaryId).ToList();
+            List<EntityEntry> afftectedEntries = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IHasSecondaryId).ToList();
             List<List<IDomainEvent>> eventsToDispatch = new();
 
             DateTraction(dbContext);
 
-            foreach (var entry in afftectedEntries)
+            foreach (EntityEntry entry in afftectedEntries)
             {
-                IReadOnlyList<IDomainEvent> domainEvents = (entry.Entity as IHasDomainEvents).UncommittedEvents();
+                if (entry.Entity is IHasDomainEvents entity && entity.EventsCount() > 0)
+                {
+                    IReadOnlyList<IDomainEvent> domainEvents = entity.UncommittedEvents();
 
-                eventsToDispatch.Add(domainEvents.Select(x => x).ToList());
-
-                (entry.Entity as IHasDomainEvents).MarkEventsAsCommitted();
+                    eventsToDispatch.Add(domainEvents.Select(x => x).ToList());
+                    entity.MarkEventsAsCommitted();
+                }
             }
 
-            int affected = await dbContext.SaveChangesAsync(true, cancellationToken).ConfigureAwait(false);
+            await dbContext.SaveChangesAsync(true, cancellationToken).ConfigureAwait(false);
 
-            if (eventsToDispatch.HasAny())
+            int affected = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IHasSecondaryId).Count();
+
+            if (affected > 0 && eventsToDispatch.HasAny())
             {
                 foreach (List<IDomainEvent> events in eventsToDispatch)
                 {

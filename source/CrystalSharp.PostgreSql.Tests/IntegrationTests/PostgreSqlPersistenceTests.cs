@@ -27,10 +27,12 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Common.Utilities;
 using CrystalSharp.Domain;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.PostgreSql.Aggregates.DepartmentAggregate;
 using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
+using CrystalSharp.Tests.Common.PostgreSql.Aggregates.ReceiptAggregate;
 
 namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
 {
@@ -137,6 +139,36 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
 
             // Assert
             result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task Receipt_and_inventory_items_saved()
+        {
+            // Arrange
+            IPostgreSqlDataContext sut = _testFixture.DataContext;
+            string receiptCode = $"RECEIPT-{RandomGenerator.GenerateNumber()}";
+            Receipt receipt = Receipt.Create(receiptCode);
+            receipt.AddInventoryItem("Headset", 2, 20.25M);
+            receipt.AddInventoryItem("Mousepad", 5, 5);
+            receipt.AddInventoryItem("Keyboard", 2, 73.52M);
+            decimal amount = receipt.TotalAmount;
+            receipt.Validate();
+            await sut.Receipt.AddAsync(receipt, CancellationToken.None).ConfigureAwait(false);
+
+            // Act
+            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            Receipt result = await sut.Receipt
+                .Include(x => x.InventoryItems)
+                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Code.Should().Be(receiptCode);
+                result.InventoryItems.Should().HaveCount(receipt.InventoryItems.Count);
+                result.TotalAmount.Should().Be(amount);
+            }
         }
     }
 }
