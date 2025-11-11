@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.Oracle.Database;
 using CrystalSharp.Tests.Common.Oracle.Aggregates.EmployeeAggregate;
+using CrystalSharp.Tests.Common.Oracle.Aggregates.SaleOrderAggregate;
 using CrystalSharp.Tests.Common.Oracle.Infrastructure.Configuration;
 
 namespace CrystalSharp.Tests.Common.Oracle.Infrastructure
@@ -33,6 +34,8 @@ namespace CrystalSharp.Tests.Common.Oracle.Infrastructure
     {
         private readonly IOracleEntityFrameworkCoreContext _entityFrameworkCoreContext;
         public DbSet<Employee> Employee { get; set; }
+        public DbSet<SaleOrder> SaleOrder { get; set; }
+        public DbSet<OrderDetail> OrderDetail { get; set; }
 
         public OracleAppDbContext()
         {
@@ -55,6 +58,8 @@ namespace CrystalSharp.Tests.Common.Oracle.Infrastructure
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new EmployeeEntityConfiguration());
+            builder.ApplyConfiguration(new SaleOrderEntityConfiguration());
+            builder.ApplyConfiguration(new OrderDetailEntityConfiguration());
         }
     }
 }

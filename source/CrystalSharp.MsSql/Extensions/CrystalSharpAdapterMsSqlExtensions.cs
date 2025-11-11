@@ -43,9 +43,15 @@ namespace CrystalSharp.MsSql.Extensions
         public static ICrystalSharpAdapter AddMsSql<TDbContext>(this ICrystalSharpAdapter crystalSharpAdapter, MsSqlSettings settings)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options => 
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseSqlServer(settings.ConnectionString));
+            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>((options) =>
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseSqlServer(settings.ConnectionString);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IMsSqlEntityFrameworkCoreContext, MsSqlEntityFrameworkCoreContext>();
 
             return crystalSharpAdapter;
@@ -74,9 +80,15 @@ namespace CrystalSharp.MsSql.Extensions
         public static ICrystalSharpAdapter AddMsSqlReadModelStore<TDbContext, TKey>(this ICrystalSharpAdapter crystalSharpAdapter, MsSqlSettings settings)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseSqlServer(settings.ConnectionString));
+            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>((options) =>
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseSqlServer(settings.ConnectionString);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MsSqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;

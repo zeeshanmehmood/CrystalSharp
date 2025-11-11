@@ -33,6 +33,6 @@ namespace CrystalSharp.MongoDb.Database
     {
         Task SaveChanges<TDocument>(TDocument document, CancellationToken cancellationToken = default) where TDocument : IAggregateRoot<string>;
         Task<TDocument> Find<TDocument>(Guid globalUId, CancellationToken cancellationToken = default) where TDocument : IAggregateRoot<string>;
-        IQueryable<TDocument> Query<TDocument>(Expression<Func<TDocument, bool>> expression) where TDocument : IAggregateRoot<string>;
+        IQueryable<TDocument> Query<TDocument>(Expression<Func<TDocument, bool>> predicate) where TDocument : IAggregateRoot<string>;
     }
 }

@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.MsSql.Database;
 using CrystalSharp.Tests.Common.MsSql.Aggregates.CurrencyAggregate;
+using CrystalSharp.Tests.Common.MsSql.Aggregates.InvoiceAggregate;
 using CrystalSharp.Tests.Common.MsSql.Infrastructure.Configuration;
 
 namespace CrystalSharp.Tests.Common.MsSql.Infrastructure
@@ -33,6 +34,8 @@ namespace CrystalSharp.Tests.Common.MsSql.Infrastructure
     {
         private readonly IMsSqlEntityFrameworkCoreContext _entityFrameworkCoreContext;
         public DbSet<Currency> Currency { get; set; }
+        public DbSet<Invoice> Invoice { get; set; }
+        public DbSet<LineItem> LineItem { get; set; }
 
         public MsSqlAppDbContext()
         {
@@ -55,6 +58,7 @@ namespace CrystalSharp.Tests.Common.MsSql.Infrastructure
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new CurrencyEntityConfiguration());
+            builder.ApplyConfiguration(new InvoiceEntityConfiguration());
         }
     }
 }

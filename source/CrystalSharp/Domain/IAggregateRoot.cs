@@ -25,10 +25,8 @@ using CrystalSharp.Domain.Infrastructure;
 
 namespace CrystalSharp.Domain
 {
-    public interface IAggregateRoot<TKey> : IEntity<TKey>, IVersion
+    public interface IAggregateRoot<TKey> : IEntity<TKey>, IVersion, IHasDomainEvents
     {
-        IReadOnlyList<IDomainEvent> UncommittedEvents();
-        void MarkEventsAsCommitted();
         void LoadStateFromHistory(IEnumerable<IDomainEvent> events);
     }
 }

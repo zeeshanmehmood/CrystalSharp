@@ -96,6 +96,17 @@ namespace CrystalSharp.Tests.Common
         protected void ConfigureOracle(string version = "")
         {
             Resolver = ConfigureServicesWithOracle(_configurationRoot, version);
+            OracleAppDbContext dbContext = GetService<OracleAppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
+
+        protected void ConfigureOracleReadModelStore(string version = "")
+        {
+            Resolver = ConfigureServicesWithOracleReadModelStore(_configurationRoot, version);
+            OracleAppDbReadModelStoreContext readModelStoreDbContext = GetService<OracleAppDbReadModelStoreContext>();
+
+            readModelStoreDbContext.Database.Migrate();
         }
 
         protected void ConfigurePostgreSql()
@@ -264,20 +275,27 @@ namespace CrystalSharp.Tests.Common
         protected IResolver ConfigureServicesWithOracle(IConfigurationRoot configurationRoot, string version = "")
         {
             string connectionString = configurationRoot.GetConnectionString("OracleDbContext");
-            string readModelStoreConnectionString = configurationRoot.GetConnectionString("OracleReadModelStoreDbContext");
-
             OracleSettings oracleSettings = new(connectionString, version);
-            OracleSettings oracleReadModelStoreSettings = new(readModelStoreConnectionString, version);
-
             IServiceCollection serviceCollection = new ServiceCollection();
 
             serviceCollection.AddScoped<IOracleDataContext>(s => s.GetRequiredService<OracleAppDbContext>());
 
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddOracle<OracleAppDbContext>(oracleSettings).CreateResolver();
 
-            return crystalSharpAdapter.AddOracle<OracleAppDbContext>(oracleSettings)
-                .AddOracleReadModelStore<OracleAppDbReadModelStoreContext, int>(oracleReadModelStoreSettings)
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithOracleReadModelStore(IConfigurationRoot configurationRoot, string version = "")
+        {
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("OracleReadModelStoreDbContext"); ;
+            OracleSettings oracleReadModelStoreSettings = new(readModelStoreConnectionString, version);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddOracleReadModelStore<OracleAppDbReadModelStoreContext, int>(oracleReadModelStoreSettings)
                 .CreateResolver();
+
+            return resolver;
         }
 
         protected IResolver ConfigureServicesWithPostgreSql(IConfigurationRoot configurationRoot)

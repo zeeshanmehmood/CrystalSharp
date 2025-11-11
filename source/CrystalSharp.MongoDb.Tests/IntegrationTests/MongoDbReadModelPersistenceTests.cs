@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Domain;
 using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
@@ -360,6 +361,30 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task Filter_read_model_by_predicate()
+        {
+            // Arrange
+            IReadModelStore<string> sut = _testFixture.ReadModelStore;
+            ContactReadModel firstContact = ContactReadModel.Create("George", "Andrew", "george.andrew@test.com");
+            ContactReadModel secondContact = ContactReadModel.Create("George", "Dan", "george.dan@test.com");
+            IList<ContactReadModel> contacts = new List<ContactReadModel>() { firstContact, secondContact };
+            await sut.BulkStore(contacts, CancellationToken.None).ConfigureAwait(false);
+            Expression<Func<ContactReadModel, bool>> predicate = x => x.FirstName.StartsWith("George") && x.EntityStatus == EntityStatus.Active;
+
+            // Act
+            IQueryable<ContactReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Should().NotBeNull();
+                result.Count().Should().Be(2);
+                result.SingleOrDefault(x => x.Email == firstContact.Email).Should().NotBeNull();
+                result.SingleOrDefault(x => x.Email == secondContact.Email).Should().NotBeNull();
+            }
+        }
+
+        [Fact]
         public async Task Get_all_records()
         {
             // Arrange
@@ -396,7 +421,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             await sut.BulkStore<ContactReadModel>(contacts.AsEnumerable()).ConfigureAwait(false);
 
             // Act
-            PagedResult<ContactReadModel> result = await sut.Get<ContactReadModel>(0, 10, predicate, RecordMode.Active, "FirstName", DataSortMode.Ascending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<ContactReadModel> result = await sut.Get<ContactReadModel>(0, 10, predicate, false, RecordMode.Active, "FirstName", DataSortMode.Ascending, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

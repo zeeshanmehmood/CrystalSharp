@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Domain;
 using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
@@ -358,6 +359,30 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task Filter_read_model_by_predicate()
+        {
+            // Arrange
+            IReadModelStore<int> sut = _testFixture.ReadModelStore;
+            SupplierReadModel crystalElectronics = SupplierReadModel.Create("Crystal Electronics", "CE");
+            SupplierReadModel crystalWoods = SupplierReadModel.Create("Crystal Woods", "CW");
+            IList<SupplierReadModel> suppliers = new List<SupplierReadModel> { crystalElectronics, crystalWoods };
+            await sut.BulkStore<SupplierReadModel>(suppliers, CancellationToken.None).ConfigureAwait(false);
+            Expression<Func<SupplierReadModel, bool>> predicate = x => x.Name.StartsWith("Crystal") && x.EntityStatus == EntityStatus.Active;
+
+            // Act
+            IQueryable<SupplierReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Should().NotBeNull();
+                result.Count().Should().Be(2);
+                result.SingleOrDefault(x => x.Name == crystalElectronics.Name).Should().NotBeNull();
+                result.SingleOrDefault(x => x.Name == crystalWoods.Name).Should().NotBeNull();
+            }
+        }
+
+        [Fact]
         public async Task Get_all_records()
         {
             // Arrange
@@ -394,7 +419,7 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             await sut.BulkStore(suppliers.AsEnumerable()).ConfigureAwait(false);
 
             // Act
-            PagedResult<SupplierReadModel> result = await sut.Get<SupplierReadModel>(0, 10, predicate, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<SupplierReadModel> result = await sut.Get<SupplierReadModel>(0, 10, predicate, false, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

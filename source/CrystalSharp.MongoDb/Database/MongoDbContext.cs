@@ -28,10 +28,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using CrystalSharp.Domain;
+using CrystalSharp.Common.Extensions;
 using CrystalSharp.Common.Settings;
-using CrystalSharp.Domain.Infrastructure;
+using CrystalSharp.Domain;
 using CrystalSharp.Domain.EventDispatching;
+using CrystalSharp.Domain.Infrastructure;
 using CrystalSharp.Infrastructure;
 
 namespace CrystalSharp.MongoDb.Database
@@ -66,10 +67,10 @@ namespace CrystalSharp.MongoDb.Database
             return document;
         }
 
-        public IQueryable<TDocument> Query<TDocument>(Expression<Func<TDocument, bool>> expression)
+        public IQueryable<TDocument> Query<TDocument>(Expression<Func<TDocument, bool>> predicate)
             where TDocument : IAggregateRoot<string>
         {
-            IMongoQueryable<TDocument> documents = GetCollection<TDocument>().AsQueryable().Where(expression);
+            IQueryable<TDocument> documents = GetCollection<TDocument>().AsQueryable().Where(predicate);
 
             return documents;
         }
@@ -94,13 +95,16 @@ namespace CrystalSharp.MongoDb.Database
             }
 
             List<List<IDomainEvent>> eventsToDispatch = new();
-            IReadOnlyList<IDomainEvent> domainEvents = document.UncommittedEvents();
 
-            eventsToDispatch.Add(domainEvents.Select(x => x).ToList());
+            if (document is IHasDomainEvents entity && entity.EventsCount() > 0)
+            {
+                IReadOnlyList<IDomainEvent> domainEvents = entity.UncommittedEvents();
 
-            document.MarkEventsAsCommitted();
+                eventsToDispatch.Add(domainEvents.Select(x => x).ToList());
+                document.MarkEventsAsCommitted();
+            }
 
-            if (eventsToDispatch != null && eventsToDispatch.Any())
+            if (eventsToDispatch.HasAny())
             {
                 foreach (List<IDomainEvent> events in eventsToDispatch)
                 {

@@ -27,8 +27,6 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using CrystalSharp.Common.Utilities;
-using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.Elasticsearch.ReadModels;

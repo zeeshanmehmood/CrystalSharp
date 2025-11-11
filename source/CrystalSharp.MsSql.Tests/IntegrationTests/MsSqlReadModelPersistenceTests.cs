@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Domain;
 using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
@@ -358,6 +359,30 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task Filter_read_model_by_predicate()
+        {
+            // Arrange
+            IReadModelStore<int> sut = _testFixture.ReadModelStore;
+            VirtualShopReadModel studyDesk = VirtualShopReadModel.Create("Study Desk", 300);
+            VirtualShopReadModel studyLamp = VirtualShopReadModel.Create("Study Lamp", 45);
+            IList<VirtualShopReadModel> products = new List<VirtualShopReadModel> { studyDesk, studyLamp };
+            await sut.BulkStore<VirtualShopReadModel>(products, CancellationToken.None).ConfigureAwait(false);
+            Expression<Func<VirtualShopReadModel, bool>> predicate = x => x.Product.StartsWith("Study") && x.EntityStatus == EntityStatus.Active;
+
+            // Act
+            IQueryable<VirtualShopReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Should().NotBeNull();
+                result.Count().Should().Be(2);
+                result.SingleOrDefault(x => x.Product == studyDesk.Product).Should().NotBeNull();
+                result.SingleOrDefault(x => x.Product == studyLamp.Product).Should().NotBeNull();
+            }
+        }
+
+        [Fact]
         public async Task Get_all_records()
         {
             // Arrange
@@ -394,7 +419,7 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             await sut.BulkStore(products.AsEnumerable()).ConfigureAwait(false);
 
             // Act
-            PagedResult<VirtualShopReadModel> result = await sut.Get<VirtualShopReadModel>(0, 10, predicate, RecordMode.Active, "Price", DataSortMode.Ascending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<VirtualShopReadModel> result = await sut.Get<VirtualShopReadModel>(0, 10, predicate, false, RecordMode.Active, "Price", DataSortMode.Ascending, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

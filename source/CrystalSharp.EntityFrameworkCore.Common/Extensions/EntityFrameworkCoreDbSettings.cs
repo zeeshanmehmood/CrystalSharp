@@ -26,7 +26,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Extensions
 {
     public abstract class EntityFrameworkCoreDbSettings : DbSettings
     {
-        public bool LazyLoading { get; set; } = true;
+        public bool LazyLoading { get; set; } = false;
 
         protected EntityFrameworkCoreDbSettings(string connectionString)
             : base(connectionString)

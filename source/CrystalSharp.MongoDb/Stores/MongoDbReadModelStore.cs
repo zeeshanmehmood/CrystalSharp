@@ -173,7 +173,7 @@ namespace CrystalSharp.MongoDb.Stores
             return totalCount;
         }
 
-        public async Task<T> Find<T>(string id, CancellationToken cancellationToken = default)
+        public async Task<T> Find<T>(string id, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<string>
         {
             FilterDefinition<T> filter = Builders<T>.Filter.And(GenerateIdFilter<T, string>(id), GenerateEntityStatusFilter<T>());
@@ -181,7 +181,7 @@ namespace CrystalSharp.MongoDb.Stores
             return await FindRecord(filter, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<T> Find<T>(Guid globalUId, CancellationToken cancellationToken = default)
+        public async Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<string>
         {
             FilterDefinition<T> filter = Builders<T>.Filter.And(GenerateIdFilter<T, Guid>(globalUId), GenerateEntityStatusFilter<T>());
@@ -189,9 +189,20 @@ namespace CrystalSharp.MongoDb.Stores
             return await FindRecord(filter, cancellationToken).ConfigureAwait(false);
         }
 
+        public virtual async Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<string>
+        {
+            await Task.CompletedTask;
+
+            IQueryable<T> records = GetCollection<T>().AsQueryable().Where(predicate);
+
+            return records;
+        }
+
         public async Task<PagedResult<T>> Get<T>(int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
@@ -209,6 +220,7 @@ namespace CrystalSharp.MongoDb.Stores
             bool useWildcard,
             int skip = 0,
             int take = 10,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
