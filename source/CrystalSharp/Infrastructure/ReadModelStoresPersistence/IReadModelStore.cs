@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,11 +50,14 @@ namespace CrystalSharp.Infrastructure.ReadModelStoresPersistence
         Task<bool> BulkRestore<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<long> Count<T>(RecordMode recordMode = RecordMode.Active, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<T> Find<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<T> Find<T>(TKey id, bool tracking = false, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>;
         Task<PagedResult<T>> Get<T>(int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
@@ -63,6 +67,7 @@ namespace CrystalSharp.Infrastructure.ReadModelStoresPersistence
             bool useWildcard,
             int skip = 0,
             int take = 10,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,

@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.MySql.Database;
+using CrystalSharp.Tests.Common.MySql.Aggregates.PurchaseOrderAggregate;
 using CrystalSharp.Tests.Common.MySql.Aggregates.SupplierAggregate;
 using CrystalSharp.Tests.Common.MySql.Infrastructure.Configuration;
 
@@ -33,6 +34,8 @@ namespace CrystalSharp.Tests.Common.MySql.Infrastructure
     {
         private readonly IMySqlEntityFrameworkCoreContext _entityFrameworkCoreContext;
         public DbSet<Supplier> Supplier { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrder { get; set; }
+        public DbSet<OrderItem> OrderItem { get; set; }
 
         public MySqlAppDbContext()
         {
@@ -55,6 +58,7 @@ namespace CrystalSharp.Tests.Common.MySql.Infrastructure
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new SupplierEntityConfiguration());
+            builder.ApplyConfiguration(new PurchaseOrderEntityConfiguration());
         }
     }
 }

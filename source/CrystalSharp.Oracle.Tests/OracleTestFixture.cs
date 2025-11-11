@@ -21,7 +21,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.Oracle.Infrastructure;
 
@@ -30,14 +29,12 @@ namespace CrystalSharp.Oracle.Tests
     public class OracleTestFixture : IntegrationTestBase, IDisposable
     {
         public IOracleDataContext DataContext { get; private set; }
-        public IReadModelStore<int> ReadModelStore { get; private set; }
 
         public OracleTestFixture()
         {
             ConfigureOracle("11");
 
             DataContext = GetService<IOracleDataContext>();
-            ReadModelStore = GetService<IReadModelStore<int>>();
         }
 
         public void Dispose()

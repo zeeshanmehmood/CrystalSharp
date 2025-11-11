@@ -30,7 +30,7 @@ using CrystalSharp.Infrastructure;
 
 namespace CrystalSharp.Domain
 {
-    public abstract class AggregateRoot<TKey> : Entity<TKey>, IAggregateRoot<TKey>, IHasDomainEvents
+    public abstract class AggregateRoot<TKey> : Entity<TKey>, IAggregateRoot<TKey>
     {
         private IList<IDomainEvent> Events { get; } = new List<IDomainEvent>();
 

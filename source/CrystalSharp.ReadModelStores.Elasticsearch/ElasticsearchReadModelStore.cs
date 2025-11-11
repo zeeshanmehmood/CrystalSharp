@@ -109,7 +109,7 @@ namespace CrystalSharp.ReadModelStores.Elasticsearch
         public async Task<bool> Delete<T>(Guid globalUId, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
-            T record = await Find<T>(globalUId, cancellationToken).ConfigureAwait(false);
+            T record = await Find<T>(globalUId, false, cancellationToken).ConfigureAwait(false);
 
             if (record is null) return false;
 
@@ -196,21 +196,30 @@ namespace CrystalSharp.ReadModelStores.Elasticsearch
             throw new NotImplementedException("Not implemented.");
         }
 
-        public async Task<T> Find<T>(TKey id, CancellationToken cancellationToken = default)
+        public async Task<T> Find<T>(TKey id, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
             return await GetRecord<T, TKey>(id, EntityStatus.Active, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<T> Find<T>(Guid globalUId, CancellationToken cancellationToken = default)
+        public async Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
             return await GetRecord<T, Guid>(globalUId, EntityStatus.Active, cancellationToken).ConfigureAwait(false);
         }
 
+        public virtual async Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            await Task.CompletedTask;
+
+            throw new NotImplementedException("This method is not implemented in the Elasticsearch read model store.");
+        }
+
         public async Task<PagedResult<T>> Get<T>(int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,
@@ -243,6 +252,7 @@ namespace CrystalSharp.ReadModelStores.Elasticsearch
             bool useWildcard,
             int skip = 0,
             int take = 10,
+            bool tracking = false,
             RecordMode recordMode = RecordMode.Active,
             string sortColumn = "",
             DataSortMode sortMode = DataSortMode.None,

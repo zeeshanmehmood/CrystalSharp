@@ -45,8 +45,14 @@ namespace CrystalSharp.PostgreSql.Extensions
             where TDbContext : DbContext
         {
             crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseNpgsql(settings.ConnectionString));
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseNpgsql(settings.ConnectionString);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IPostgreSqlEntityFrameworkCoreContext, PostgreSqlEntityFrameworkCoreContext>();
 
             return crystalSharpAdapter;
@@ -77,8 +83,14 @@ namespace CrystalSharp.PostgreSql.Extensions
             where TDbContext : DbContext
         {
             crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseNpgsql(settings.ConnectionString));
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseNpgsql(settings.ConnectionString);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, PostgreSqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;

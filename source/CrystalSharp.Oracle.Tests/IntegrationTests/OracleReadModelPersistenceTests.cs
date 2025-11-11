@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using CrystalSharp.Domain;
 using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.Paging;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
@@ -38,11 +39,11 @@ using CrystalSharp.Tests.Common.Oracle.ReadModels;
 namespace CrystalSharp.Oracle.Tests.IntegrationTests
 {
     [Trait(TestSettings.Category, TestType.OracleReadModelPersistenceIntegration)]
-    public class OracleReadModelPersistenceTests : IClassFixture<OracleTestFixture>
+    public class OracleReadModelPersistenceTests : IClassFixture<OracleReadModelStoreTestFixture>
     {
-        private readonly OracleTestFixture _testFixture;
+        private readonly OracleReadModelStoreTestFixture _testFixture;
 
-        public OracleReadModelPersistenceTests(OracleTestFixture fixture)
+        public OracleReadModelPersistenceTests(OracleReadModelStoreTestFixture fixture)
         {
             _testFixture = fixture;
         }
@@ -358,6 +359,30 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
         }
 
         [Fact]
+        public async Task Filter_read_model_by_predicate()
+        {
+            // Arrange
+            IReadModelStore<int> sut = _testFixture.ReadModelStore;
+            CustomerReadModel firstCustomer = CustomerReadModel.Create("George Andrew", "GEA");
+            CustomerReadModel secondCustomer = CustomerReadModel.Create("George Dan", "GED");
+            IList<CustomerReadModel> customers = new List<CustomerReadModel> { firstCustomer, secondCustomer };
+            await sut.BulkStore<CustomerReadModel>(customers, CancellationToken.None).ConfigureAwait(false);
+            Expression<Func<CustomerReadModel, bool>> predicate = x => x.Name.StartsWith("George") && x.EntityStatus == EntityStatus.Active;
+
+            // Act
+            IQueryable<CustomerReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+
+            // Assert
+            using (new AssertionScope())
+            {
+                result.Should().NotBeNull();
+                result.Count().Should().Be(2);
+                result.SingleOrDefault(x => x.Name == firstCustomer.Name).Should().NotBeNull();
+                result.SingleOrDefault(x => x.Name == secondCustomer.Name).Should().NotBeNull();
+            }
+        }
+
+        [Fact]
         public async Task Get_all_records()
         {
             // Arrange
@@ -394,7 +419,7 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             await sut.BulkStore(customers).ConfigureAwait(false);
 
             // Act
-            PagedResult<CustomerReadModel> result = await sut.Get<CustomerReadModel>(0, 10, predicate, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<CustomerReadModel> result = await sut.Get<CustomerReadModel>(0, 10, predicate, false, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

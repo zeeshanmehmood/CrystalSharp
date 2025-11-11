@@ -24,12 +24,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.Tests.Common.Oracle.Aggregates.EmployeeAggregate;
+using CrystalSharp.Tests.Common.Oracle.Aggregates.SaleOrderAggregate;
 
 namespace CrystalSharp.Tests.Common.Oracle.Infrastructure
 {
     public interface IOracleDataContext
     {
         DbSet<Employee> Employee { get; set; }
+        DbSet<SaleOrder> SaleOrder { get; set; }
+        DbSet<OrderDetail> OrderDetail { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

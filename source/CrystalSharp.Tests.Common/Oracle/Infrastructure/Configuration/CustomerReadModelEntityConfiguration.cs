@@ -30,13 +30,13 @@ namespace CrystalSharp.Tests.Common.Oracle.Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<CustomerReadModel> builder)
         {
-            builder.Property(x => x.Id).HasColumnName("ID");
-            builder.Property(x => x.GlobalUId).HasColumnName("GLOBALUID");
-            builder.Property(x => x.EntityStatus).HasColumnName("ENTITYSTATUS");
-            builder.Property(x => x.CreatedOn).HasColumnName("CREATEDON");
-            builder.Property(x => x.ModifiedOn).HasColumnName("MODIFIEDON");
-            builder.Property(x => x.Name).HasColumnName("NAME");
-            builder.Property(x => x.Code).HasColumnName("CODE");
+            builder.Property(x => x.Id).HasColumnName(nameof(CustomerReadModel.Id).ToUpper());
+            builder.Property(x => x.GlobalUId).HasColumnName(nameof(CustomerReadModel.GlobalUId).ToUpper());
+            builder.Property(x => x.EntityStatus).HasColumnName(nameof(CustomerReadModel.EntityStatus).ToUpper());
+            builder.Property(x => x.CreatedOn).HasColumnName(nameof(CustomerReadModel.CreatedOn).ToUpper());
+            builder.Property(x => x.ModifiedOn).HasColumnName(nameof(CustomerReadModel.ModifiedOn).ToUpper());
+            builder.Property(x => x.Name).HasColumnName(nameof(CustomerReadModel.Name).ToUpper());
+            builder.Property(x => x.Code).HasColumnName(nameof(CustomerReadModel.Code).ToUpper());
         }
     }
 }

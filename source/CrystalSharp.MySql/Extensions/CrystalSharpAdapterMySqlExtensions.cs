@@ -46,8 +46,14 @@ namespace CrystalSharp.MySql.Extensions
             ServerVersion serverVersion = ServerVersion.AutoDetect(connectionString);
 
             crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseMySql(connectionString, serverVersion));
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseMySql(connectionString, serverVersion);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IMySqlEntityFrameworkCoreContext, MySqlEntityFrameworkCoreContext>();
 
             return crystalSharpAdapter;
@@ -79,8 +85,14 @@ namespace CrystalSharp.MySql.Extensions
             ServerVersion serverVersion = ServerVersion.AutoDetect(connectionString);
 
             crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-            options.UseLazyLoadingProxies(settings.LazyLoading)
-            .UseMySql(connectionString, serverVersion));
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseMySql(connectionString, serverVersion);
+            });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MySqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;

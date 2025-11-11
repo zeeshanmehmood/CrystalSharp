@@ -53,25 +53,37 @@ namespace CrystalSharp.Oracle.Extensions
         private static void AddOracleWithOptions<TDbContext>(ICrystalSharpAdapter crystalSharpAdapter, OracleSettings settings)
             where TDbContext : DbContext
         {
-            if (!string.IsNullOrEmpty(settings.Version))
-            {
 #if NET8_0
-                crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-                options.UseLazyLoadingProxies(settings.LazyLoading)
-                .UseOracle(settings.ConnectionString));
-#else
-                crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-                options.UseLazyLoadingProxies(settings.LazyLoading)
-                .UseOracle(settings.ConnectionString,
-                p => { p.UseOracleSQLCompatibility(settings.Version); }));
-#endif
-            }
-            else
+            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
             {
-                crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
-                options.UseLazyLoadingProxies(settings.LazyLoading)
-                .UseOracle(settings.ConnectionString));
-            }
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                options = options.UseOracle(settings.ConnectionString);
+            });
+#else
+            crystalSharpAdapter.ServiceCollection.AddDbContext<TDbContext>(options =>
+            {
+                if (settings.LazyLoading)
+                {
+                    options = options.UseLazyLoadingProxies(settings.LazyLoading);
+                }
+
+                if (!string.IsNullOrEmpty(settings.Version))
+                {
+                    options = options.UseOracle(settings.ConnectionString, p =>
+                    {
+                        p.UseOracleSQLCompatibility(settings.Version);
+                    });
+                }
+                else
+                {
+                    options = options.UseOracle(settings.ConnectionString);
+                }
+            });
+#endif
         }
     }
 }

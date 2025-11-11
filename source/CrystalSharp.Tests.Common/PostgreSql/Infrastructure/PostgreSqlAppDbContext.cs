@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CrystalSharp.PostgreSql.Database;
 using CrystalSharp.Tests.Common.PostgreSql.Aggregates.DepartmentAggregate;
+using CrystalSharp.Tests.Common.PostgreSql.Aggregates.ReceiptAggregate;
 using CrystalSharp.Tests.Common.PostgreSql.Infrastructure.Configuration;
 
 namespace CrystalSharp.Tests.Common.PostgreSql.Infrastructure
@@ -33,6 +34,8 @@ namespace CrystalSharp.Tests.Common.PostgreSql.Infrastructure
     {
         private readonly IPostgreSqlEntityFrameworkCoreContext _entityFrameworkCoreContext;
         public DbSet<Department> Department { get; set; }
+        public DbSet<Receipt> Receipt { get; set; }
+        public DbSet<InventoryItem> InventoryItem { get; set; }
 
         public PostgreSqlAppDbContext()
         {
@@ -55,6 +58,7 @@ namespace CrystalSharp.Tests.Common.PostgreSql.Infrastructure
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new DepartmentEntityConfiguration());
+            builder.ApplyConfiguration(new ReceiptEntityConfiguration());
         }
     }
 }
