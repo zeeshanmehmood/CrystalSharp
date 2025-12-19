@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CrystalSharp.EventStores.KurrentDb.Tests/CrystalSharp.EventStores.KurrentDb.Tests.csproj" Id="2ad22c86-a413-428f-96bf-9485bfb8662d" />
+  <Project Path="CrystalSharp.EventStores.KurrentDb/CrystalSharp.EventStores.KurrentDb.csproj" Id="710cb895-a2f6-470b-af2a-519b5c461d91" />
+  <Project Path="CrystalSharp.Tests.Common/CrystalSharp.Tests.Common.csproj" Id="b7be70ee-8a73-41d0-9427-de53d18c7260" />
+  <Project Path="CrystalSharp/CrystalSharp.csproj" Id="a60f24da-75fe-4ee8-a89a-89e5e5f842ec" />
+</Solution>
