@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrystalSharp.Common.Extensions;
+using System;
 
 namespace CrystalSharp.Domain.Infrastructure
 {
@@ -6,7 +7,7 @@ namespace CrystalSharp.Domain.Infrastructure
     {
         public Guid StreamId { get; set; }
         public string StreamName { get; set; }
-        public Guid EventId { get; set; } = Guid.CreateVersion7();
+        public Guid EventId { get; set; } = Guid.Create();
         public string EventType { get; set; }
         public string EventAssembly { get; set; }
         public int EntityStatus { get; set; }

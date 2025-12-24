@@ -70,7 +70,7 @@ namespace CrystalSharp.Sagas
 
         public async Task<SagaResult> Run(CancellationToken cancellationToken = default)
         {
-            Guid correlationId = Guid.CreateVersion7();
+            Guid correlationId = Guid.Create();
 
             return await Run(correlationId, cancellationToken).ConfigureAwait(false);
         }

@@ -53,7 +53,7 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots
 
             DbSnapshotEntity dbSnapshotEntity = new()
             {
-                SnapshotId = Guid.CreateVersion7(),
+                SnapshotId = Guid.Create(),
                 EntityStatus = 1,
                 CreatedAt = SystemDate.UtcNow,
                 SnapshotVersion = snapshot.SnapshotVersion,

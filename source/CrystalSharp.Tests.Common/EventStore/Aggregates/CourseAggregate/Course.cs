@@ -1,4 +1,5 @@
-﻿using CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots;
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots;
 using CrystalSharp.Tests.Common.EventStore.Aggregates.CourseAggregate.Events;
 using CrystalSharp.Tests.Common.EventStore.Aggregates.CourseAggregate.Snapshots;
 using System;
@@ -7,7 +8,7 @@ namespace CrystalSharp.Tests.Common.EventStore.Aggregates.CourseAggregate
 {
     public class Course : SnapshotAggregateRoot<string, CourseSnapshot>
     {
-        public override string Id { get; protected set; } = Guid.CreateVersion7().ToString("N");
+        public override string Id { get; protected set; } = Guid.Create("N");
         public string Name { get; private set; }
         public CourseInfo CourseInfo { get; private set; }
 

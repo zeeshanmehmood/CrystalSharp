@@ -5,9 +5,12 @@ namespace CrystalSharp.Common.Extensions
 {
     public static class EnumerableExtensions
     {
-        public static bool HasAny<T>(this IEnumerable<T> source)
+        extension<T>(IEnumerable<T> source)
         {
-            return source is not null && source.Any();
+            public bool HasAny()
+            {
+                return source is not null && source.Any();
+            }
         }
     }
 }

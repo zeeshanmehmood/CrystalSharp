@@ -1,4 +1,5 @@
-﻿using CrystalSharp.Infrastructure.EventStoresPersistence;
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Infrastructure.EventStoresPersistence;
 using CrystalSharp.Infrastructure.EventStoresPersistence.Exceptions;
 using CrystalSharp.Tests.Common;
 using CrystalSharp.Tests.Common.EventStore.Aggregates.ProductAggregate;
@@ -154,7 +155,7 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
 
             // Act
-            Func<Task<Product>> result = async () => await sut.Get<Product>(Guid.CreateVersion7(), CancellationToken.None).ConfigureAwait(false);
+            Func<Task<Product>> result = async () => await sut.Get<Product>(Guid.Create(), CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             await result.Should().ThrowAsync<EventStoreStreamNotFoundException>();

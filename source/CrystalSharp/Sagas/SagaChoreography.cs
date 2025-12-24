@@ -25,7 +25,7 @@ namespace CrystalSharp.Sagas
             Func<Task> compensation,
             CancellationToken cancellationToken = default)
         {
-            Guid correlationId = Guid.CreateVersion7();
+            Guid correlationId = Guid.Create();
 
             return await Execute(correlationId, transaction, compensation, cancellationToken).ConfigureAwait(false);
         }

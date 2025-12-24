@@ -104,7 +104,7 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
 
             foreach (IDbDomainEvent @event in eventsToSave)
             {
-                (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.StoreEventQuery(Guid.CreateVersion7(),
+                (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.StoreEventQuery(Guid.Create(),
                     @event.StreamId,
                     @event.StreamName,
                     ++lastSequence,

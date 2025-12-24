@@ -5,34 +5,32 @@ namespace CrystalSharp.Common.Extensions
 {
     public static class QueryableExtensions
     {
-        public static IQueryable<T> OrderBy<T>(this IQueryable<T> queryable, string propertyName)
+        extension<T>(IQueryable<T> queryable)
         {
-            ParameterExpression parameterExpression = Expression.Parameter(typeof(T));
-            MemberExpression memberExpression = Expression.PropertyOrField(parameterExpression, propertyName);
-            LambdaExpression lambdaExpression = Expression.Lambda(memberExpression, parameterExpression);
-            MethodCallExpression methodCallExpression = Expression.Call(
-                typeof(Queryable),
-                "OrderBy",
-                [typeof(T), memberExpression.Type],
-                queryable.Expression,
-                Expression.Quote(lambdaExpression));
+            public IQueryable<T> OrderBy(string propertyName)
+            {
+                return DoOrdering<T>(queryable, propertyName, "OrderBy");
+            }
 
-            return queryable.Provider.CreateQuery<T>(methodCallExpression);
-        }
+            public IQueryable<T> OrderByDescending(string propertyName)
+            {
+                return DoOrdering<T>(queryable, propertyName, "OrderByDescending");
+            }
 
-        public static IQueryable<T> OrderByDescending<T>(this IQueryable<T> queryable, string propertyName)
-        {
-            ParameterExpression parameterExpression = Expression.Parameter(typeof(T));
-            MemberExpression memberExpression = Expression.PropertyOrField(parameterExpression, propertyName);
-            LambdaExpression lambdaExpression = Expression.Lambda(memberExpression, parameterExpression);
-            MethodCallExpression methodCallExpression = Expression.Call(
-                typeof(Queryable),
-                "OrderByDescending",
-                [typeof(T), memberExpression.Type],
-                queryable.Expression,
-                Expression.Quote(lambdaExpression));
+            private static IQueryable<T> DoOrdering(IQueryable<T> queryableSource, string propertyName, string orderingMethod)
+            {
+                ParameterExpression parameterExpression = Expression.Parameter(typeof(T));
+                MemberExpression memberExpression = Expression.PropertyOrField(parameterExpression, propertyName);
+                LambdaExpression lambdaExpression = Expression.Lambda(memberExpression, parameterExpression);
+                MethodCallExpression methodCallExpression = Expression.Call(
+                    typeof(Queryable),
+                    orderingMethod,
+                    [typeof(T), memberExpression.Type],
+                    queryableSource.Expression,
+                    Expression.Quote(lambdaExpression));
 
-            return queryable.Provider.CreateQuery<T>(methodCallExpression);
+                return queryableSource.Provider.CreateQuery<T>(methodCallExpression);
+            }
         }
     }
 }

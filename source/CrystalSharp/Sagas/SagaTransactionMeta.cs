@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CrystalSharp.Common.Extensions;
+using System;
 
 namespace CrystalSharp.Sagas
 {
     public class SagaTransactionMeta
     {
-        public string Id { get; private set; } = Guid.CreateVersion7().ToString("N");
+        public string Id { get; private set; } = Guid.Create("N");
         public string CorrelationId { get; set; }
         public string StartedBy { get; set; }
         public string Step { get; set; }

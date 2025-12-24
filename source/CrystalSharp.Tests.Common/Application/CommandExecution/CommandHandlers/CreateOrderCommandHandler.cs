@@ -1,5 +1,6 @@
 ﻿using CrystalSharp.Application;
 using CrystalSharp.Application.Handlers;
+using CrystalSharp.Common.Extensions;
 using CrystalSharp.Tests.Common.Application.CommandExecution.Commands;
 using CrystalSharp.Tests.Common.Application.CommandExecution.Responses;
 using System;
@@ -12,7 +13,7 @@ namespace CrystalSharp.Tests.Common.Application.CommandExecution.CommandHandlers
     {
         public override async Task<CommandExecutionResult<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken = default)
         {
-            CreateOrderResponse response = new() { Id = Guid.CreateVersion7(), Success = true, OrderCode = request.OrderCode };
+            CreateOrderResponse response = new() { Id = Guid.Create(), Success = true, OrderCode = request.OrderCode };
 
             return await Ok(response);
         }
