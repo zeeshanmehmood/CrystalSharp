@@ -1,4 +1,6 @@
 ﻿using CrystalSharp.EventStores.KurrentDb.Extensions;
+using CrystalSharp.Messaging.AzureServiceBus.Configuration;
+using CrystalSharp.Messaging.AzureServiceBus.Extensions;
 using CrystalSharp.Messaging.RabbitMq.Configuration;
 using CrystalSharp.Messaging.RabbitMq.Extensions;
 using CrystalSharp.Tests.Common.Envoy.Requests;
@@ -21,6 +23,11 @@ namespace CrystalSharp.Tests.Common
         protected void ConfigureKurrentDb()
         {
             Resolver = ConfigureServicesWithKurrentDb(_configurationRoot);
+        }
+
+        protected void ConfigureAzureServiceBus()
+        {
+            Resolver = ConfigureServicesWithAzureServiceBus(_configurationRoot);
         }
 
         protected void ConfigureRabbitMq()
@@ -50,6 +57,17 @@ namespace CrystalSharp.Tests.Common
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
             return crystalSharpAdapter.AddKurrentDbEventStore<int>(eventStoreConnectionString).CreateResolver();
+        }
+
+        protected IResolver ConfigureServicesWithAzureServiceBus(IConfigurationRoot configurationRoot)
+        {
+            string configurationSection = "AppConfiguration:AzureServiceBusConfiguration:";
+            string connectionString = configurationRoot.GetSection($"{configurationSection}ConnectionString").Value;
+            AzureServiceBusSettings settings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            return crystalSharpAdapter.AddAzureServiceBus(settings).CreateResolver();
         }
 
         protected IResolver ConfigureServicesWithRabbitMq(IConfigurationRoot configurationRoot)
