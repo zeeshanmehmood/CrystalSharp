@@ -11,21 +11,21 @@ namespace CrystalSharp.Infrastructure.ReadModelStoresPersistence
 {
     public interface IReadModelStore<TKey>
     {
-        Task<bool> Store<T>(T record, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkStore<T>(IEnumerable<T> records, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> Update<T>(T record, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> Delete<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> Delete<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> SoftDelete<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> SoftDelete<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkSoftDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkSoftDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> Restore<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> Restore<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkRestore<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
-        Task<bool> BulkRestore<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Store<T>(T record, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkStore<T>(IEnumerable<T> records, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Update<T>(T record, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Delete<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Delete<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> SoftDelete<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> SoftDelete<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkSoftDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkSoftDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Restore<T>(TKey id, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> Restore<T>(Guid globalUId, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkRestore<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
+        Task<int> BulkRestore<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<long> Count<T>(RecordMode recordMode = RecordMode.Active, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<T> Find<T>(TKey id, bool tracking = false, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;

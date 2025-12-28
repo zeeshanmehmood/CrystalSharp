@@ -1,0 +1,485 @@
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Common.Settings;
+using CrystalSharp.Domain;
+using CrystalSharp.EntityFrameworkCore.Common.Extensions;
+using CrystalSharp.Infrastructure;
+using CrystalSharp.Infrastructure.Paging;
+using CrystalSharp.Infrastructure.ReadModels;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace CrystalSharp.EntityFrameworkCore.Common.Stores
+{
+    public abstract class ReadModelStore<TDbContext, TKey>(TDbContext dbContext) where TDbContext : DbContext
+    {
+        private readonly TDbContext _dbContext = dbContext;
+
+        public virtual async Task<int> Store<T>(T record, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            await _dbContext.Set<T>().AddAsync(record, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        public virtual async Task<int> BulkStore<T>(IEnumerable<T> records, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!records.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            await _dbContext.Set<T>().AddRangeAsync(records, cancellationToken).ConfigureAwait(false);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        public virtual async Task<int> Update<T>(T record, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            _dbContext.Set<T>().Update(record);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        public virtual async Task<int> Delete<T>(TKey id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int deleted = await DeleteRecord<T, TKey>(id, cancellationToken).ConfigureAwait(false);
+
+            return deleted;
+        }
+
+        public virtual async Task<int> Delete<T>(Guid globalUId, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int deleted = await DeleteRecord<T, Guid>(globalUId, cancellationToken).ConfigureAwait(false);
+
+            return deleted;
+        }
+
+        public virtual async Task<int> SoftDelete<T>(TKey id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int deleted = await SoftDeleteRecord<T, TKey>(id, cancellationToken).ConfigureAwait(false);
+
+            return deleted;
+        }
+
+        public virtual async Task<int> SoftDelete<T>(Guid globalUId, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int deleted = await SoftDeleteRecord<T, Guid>(globalUId, cancellationToken).ConfigureAwait(false);
+
+            return deleted;
+        }
+
+        public virtual async Task<int> BulkDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!ids.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int bulkDeleted = await BulkDeleteRecords<T, TKey>(ids, cancellationToken).ConfigureAwait(false);
+
+            return bulkDeleted;
+        }
+
+        public virtual async Task<int> BulkDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!globalUIds.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int bulkDeleted = await BulkDeleteRecords<T, Guid>(globalUIds, cancellationToken).ConfigureAwait(false);
+
+            return bulkDeleted;
+        }
+
+        public virtual async Task<int> BulkSoftDelete<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!ids.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int bulkDeleted = await BulkSoftDeleteRecords<T, TKey>(ids, cancellationToken).ConfigureAwait(false);
+
+            return bulkDeleted;
+        }
+
+        public virtual async Task<int> BulkSoftDelete<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!globalUIds.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int bulkDeleted = await BulkSoftDeleteRecords<T, Guid>(globalUIds, cancellationToken).ConfigureAwait(false);
+
+            return bulkDeleted;
+        }
+
+        public virtual async Task<int> Restore<T>(TKey id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int restored = await RestoreSoftDeletedRecord<T, TKey>(id, cancellationToken).ConfigureAwait(false);
+
+            return restored;
+        }
+
+        public virtual async Task<int> Restore<T>(Guid globalUId, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            int restored = await RestoreSoftDeletedRecord<T, Guid>(globalUId, cancellationToken).ConfigureAwait(false);
+
+            return restored;
+        }
+
+        public virtual async Task<int> BulkRestore<T>(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!ids.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int restored = await BulkRestoreSoftDeleteRecords<T, TKey>(ids, cancellationToken).ConfigureAwait(false);
+
+            return restored;
+        }
+
+        public virtual async Task<int> BulkRestore<T>(IEnumerable<Guid> globalUIds, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            if (!globalUIds.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            int restored = await BulkRestoreSoftDeleteRecords<T, Guid>(globalUIds, cancellationToken).ConfigureAwait(false);
+
+            return restored;
+        }
+
+        public virtual async Task<long> Count<T>(RecordMode recordMode = RecordMode.Active, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateEntityStatusPredicate<T>(recordMode);
+            long totalCount = await _dbContext.Set<T>().AsNoTracking().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+
+            return totalCount;
+        }
+
+        public virtual async Task<long> Count<T>(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            long totalCount = await _dbContext.Set<T>().AsNoTracking().Where(predicate).LongCountAsync(cancellationToken).ConfigureAwait(false);
+
+            return totalCount;
+        }
+
+        public virtual async Task<T> Find<T>(TKey id, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, TKey>(id);
+            T existing = tracking
+                ?
+                await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)
+                :
+                await _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+            return existing;
+        }
+
+        public virtual async Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, Guid>(globalUId);
+            T existing = tracking
+                ?
+                await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)
+                :
+                await _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            return existing;
+        }
+
+        public virtual async Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            await Task.CompletedTask;
+
+            IQueryable<T> records = tracking ? _dbContext.Set<T>().Where(predicate) : _dbContext.Set<T>().AsNoTracking().Where(predicate);
+
+            return records;
+        }
+
+        public virtual async Task<PagedResult<T>> Get<T>(int skip = 0,
+            int take = 10,
+            Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
+            RecordMode recordMode = RecordMode.Active,
+            string sortColumn = "",
+            DataSortMode sortMode = DataSortMode.None,
+            CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            PagedResult<T> result = await GetRecords(skip, take, predicate, tracking, recordMode, sortColumn, sortMode, cancellationToken).ConfigureAwait(false);
+
+            return result;
+        }
+
+        private Expression<Func<T, bool>> GenerateIdPredicate<T, TId>(TId id)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = x => (id is Guid) ? x.GlobalUId.Equals(id) : x.Id.Equals(id);
+
+            return predicate;
+        }
+
+        private Expression<Func<T, bool>> GenerateEntityStatusPredicate<T>(RecordMode recordMode = RecordMode.Active)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate;
+
+            if (recordMode == RecordMode.Active || recordMode == RecordMode.SoftDeleted)
+            {
+                predicate = x => (recordMode == RecordMode.Active) ? x.EntityStatus == EntityStatus.Active : x.EntityStatus == EntityStatus.Deleted;
+            }
+            else
+            {
+                predicate = x => true;
+            }
+
+            return predicate;
+        }
+
+        private Expression<Func<T, bool>> GenerateIdAndEntityStatusPredicate<T, TId>(TId id, EntityStatus entityStatus = EntityStatus.Active)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = x => (id is Guid) ? x.GlobalUId.Equals(id) && x.EntityStatus == entityStatus : x.Id.Equals(id) && x.EntityStatus == entityStatus;
+
+            return predicate;
+        }
+
+        private async Task<int> DeleteRecord<T, TId>(TId id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdPredicate<T, TId>(id);
+            T existing = await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (existing is null) return DefaultDbSettings.NoRecordsAffected;
+
+            _dbContext.Set<T>().Remove(existing);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        private async Task<int> SoftDeleteRecord<T, TId>(TId id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, TId>(id);
+            T existing = await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
+            if (existing is null) return DefaultDbSettings.NoRecordsAffected;
+
+            existing.EntityStatus = EntityStatus.Deleted;
+
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        private async Task<int> BulkDeleteRecords<T, TId>(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate;
+
+            if (ids is IEnumerable<Guid>)
+            {
+                IEnumerable<Guid> listUIds = ids.Select(x => Guid.Parse(x.ToString()));
+                predicate = x => listUIds.Contains(x.GlobalUId);
+            }
+            else
+            {
+                IEnumerable<TKey> listIds = ids.Select(x => (TKey)Convert.ChangeType(x, typeof(TKey)));
+                predicate = x => listIds.Contains(x.Id);
+            }
+
+            IQueryable<T> existingRecords = _dbContext.Set<T>().Where(predicate);
+
+            if (!existingRecords.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            _dbContext.RemoveRange(existingRecords);
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        private async Task<int> BulkSoftDeleteRecords<T, TId>(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate;
+
+            if (ids is IEnumerable<Guid>)
+            {
+                IEnumerable<Guid> listUIds = ids.Select(x => Guid.Parse(x.ToString()));
+                predicate = x => listUIds.Contains(x.GlobalUId) && x.EntityStatus == EntityStatus.Active;
+            }
+            else
+            {
+                IEnumerable<TKey> listIds = ids.Select(x => (TKey)Convert.ChangeType(x, typeof(TKey)));
+                predicate = x => listIds.Contains(x.Id) && x.EntityStatus == EntityStatus.Active;
+            }
+
+            IQueryable<T> existingRecords = _dbContext.Set<T>().Where(predicate);
+
+            if (!existingRecords.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            foreach (T record in existingRecords)
+            {
+                record.EntityStatus = EntityStatus.Deleted;
+            }
+
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        private async Task<int> RestoreSoftDeletedRecord<T, TId>(TId id, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate = GenerateIdAndEntityStatusPredicate<T, TId>(id, EntityStatus.Deleted);
+            T existingRecord = await _dbContext.Set<T>().Where(predicate).SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+
+            if (existingRecord is null) return DefaultDbSettings.NoRecordsAffected;
+
+            existingRecord.EntityStatus = EntityStatus.Active;
+            int restored = await Update(existingRecord, cancellationToken).ConfigureAwait(false);
+
+            return restored;
+        }
+
+        private async Task<int> BulkRestoreSoftDeleteRecords<T, TId>(IEnumerable<TId> ids, CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            Expression<Func<T, bool>> predicate;
+
+            if (ids is IEnumerable<Guid>)
+            {
+                IEnumerable<Guid> listUIds = ids.Select(x => Guid.Parse(x.ToString()));
+                predicate = x => listUIds.Contains(x.GlobalUId) && x.EntityStatus == EntityStatus.Deleted;
+            }
+            else
+            {
+                IEnumerable<TKey> listIds = ids.Select(x => (TKey)Convert.ChangeType(x, typeof(TKey)));
+                predicate = x => listIds.Contains(x.Id) && x.EntityStatus == EntityStatus.Deleted;
+            }
+
+            IQueryable<T> existingRecords = _dbContext.Set<T>().Where(predicate);
+
+            if (!existingRecords.HasAny()) return DefaultDbSettings.NoRecordsAffected;
+
+            foreach (T record in existingRecords)
+            {
+                record.EntityStatus = EntityStatus.Active;
+            }
+
+            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(_dbContext);
+
+            return affected;
+        }
+
+        private async Task<PagedResult<T>> GetRecords<T>(int skip = 0,
+            int take = 10,
+            Expression<Func<T, bool>> predicate = null,
+            bool tracking = false,
+            RecordMode recordMode = RecordMode.Active,
+            string sortColumn = "",
+            DataSortMode sortMode = DataSortMode.None,
+            CancellationToken cancellationToken = default)
+            where T : class, IReadModel<TKey>
+        {
+            await Task.CompletedTask;
+
+            long totalRecords = 0;
+            Expression<Func<T, bool>> recordModePredicate;
+
+            predicate ??= x => true;
+
+            if (recordMode == RecordMode.Active)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Active;
+            }
+            else if (recordMode == RecordMode.SoftDeleted)
+            {
+                recordModePredicate = x => x.EntityStatus == EntityStatus.Deleted;
+            }
+            else
+            {
+                recordModePredicate = x => true;
+            }
+
+            totalRecords = _dbContext.Set<T>().AsNoTracking().Where(predicate).Where(recordModePredicate).LongCount();
+            IQueryable<T> records = _dbContext.Get<T, TKey>(skip, take, predicate, tracking, recordMode, sortColumn, sortMode);
+            PagedResult<T> result = null;
+
+            if (records.HasAny())
+            {
+                result = new PagedResult<T>(skip, take, totalRecords, records);
+            }
+
+            return result;
+        }
+
+        private void DateTraction(TDbContext dbContext)
+        {
+            var modifiedItems = dbContext.ChangeTracker
+                .Entries<IReadModel<TKey>>()
+                .Where(entity => entity.State == EntityState.Modified);
+
+            var newItems = dbContext.ChangeTracker
+                .Entries<IReadModel<TKey>>()
+                .Where(entity => entity.State == EntityState.Added);
+
+            foreach (var item in modifiedItems)
+            {
+                item.Entity.ModifiedOn = SystemDate.UtcNow;
+            }
+
+            foreach (var item in newItems)
+            {
+                item.Entity.CreatedAt = SystemDate.UtcNow;
+            }
+        }
+
+        private async Task<int> SaveChanges(TDbContext dbContext, CancellationToken cancellationToken = default)
+        {
+            DateTraction(dbContext);
+
+            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            int affected = GetAffected(dbContext);
+
+            return affected;
+        }
+
+        private int GetAffected(TDbContext dbContext)
+        {
+            int affected = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IReadModel<TKey>).Count();
+
+            return affected;
+        }
+    }
+}

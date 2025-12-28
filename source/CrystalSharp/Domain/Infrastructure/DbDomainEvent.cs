@@ -2,7 +2,7 @@
 
 namespace CrystalSharp.Domain.Infrastructure
 {
-    public abstract class DbDomainEvent : DomainEvent, IDbDomainEvent
+    public class DbDomainEvent : DomainEvent, IDbDomainEvent
     {
         public Guid Id { get; set; }
         public long GlobalSequence { get; set; }

@@ -3,7 +3,14 @@ using CrystalSharp.Messaging.AzureServiceBus.Configuration;
 using CrystalSharp.Messaging.AzureServiceBus.Extensions;
 using CrystalSharp.Messaging.RabbitMq.Configuration;
 using CrystalSharp.Messaging.RabbitMq.Extensions;
+using CrystalSharp.MsSql.Extensions;
+using CrystalSharp.MsSql.Migrator;
+using CrystalSharp.MsSql.Settings;
+using CrystalSharp.MsSql.Stores;
 using CrystalSharp.Tests.Common.Envoy.Requests;
+using CrystalSharp.Tests.Common.MsSql.Infrastructure;
+using CrystalSharp.Tests.Common.MsSql.Interceptors;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
@@ -23,6 +30,27 @@ namespace CrystalSharp.Tests.Common
         protected void ConfigureKurrentDb()
         {
             Resolver = ConfigureServicesWithKurrentDb(_configurationRoot);
+        }
+
+        protected void ConfigureMsSql()
+        {
+            Resolver = ConfigureServicesWithMsSql(_configurationRoot);
+            MsSqlAppDbContext dbContext = GetService<MsSqlAppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
+
+        protected void ConfigureMsSqlEventStore()
+        {
+            Resolver = ConfigureServicesWithMsSqlEventStore(_configurationRoot);
+        }
+
+        protected void ConfigureMsSqlReadModelStore()
+        {
+            Resolver = ConfigureServicesWithMsSqlReadModelStore(_configurationRoot);
+            MsSqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<MsSqlAppDbReadModelStoreContext>();
+
+            readModelStoreDbContext.Database.Migrate();
         }
 
         protected void ConfigureAzureServiceBus()
@@ -57,6 +85,52 @@ namespace CrystalSharp.Tests.Common
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
             return crystalSharpAdapter.AddKurrentDbEventStore<int>(eventStoreConnectionString).CreateResolver();
+        }
+
+        protected IResolver ConfigureServicesWithMsSql(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MsSqlDbContext");
+            MsSqlSettings msSqlSettings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddScoped<IMsSqlDataContext>(s => s.GetRequiredService<MsSqlAppDbContext>());
+
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMsSql<MsSqlAppDbContext>(
+                msSqlSettings,
+                typeof(CurrencyNameValidatorInterceptor),
+                typeof(InvoiceCodeValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMsSqlEventStore(IConfigurationRoot configurationRoot)
+        {
+            string eventStoreConnectionString = configurationRoot.GetConnectionString("MsSqlEventStoreDb");
+            MsSqlSettings msSqlEventStoreSettings = new(eventStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMsSqlEventStoreDb<int>(msSqlEventStoreSettings).CreateResolver();
+            IMsSqlDatabaseMigrator msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+
+            MsSqlEventStoreSetup.Run(msSqlDatabaseMigrator, msSqlEventStoreSettings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMsSqlReadModelStore(IConfigurationRoot configurationRoot)
+        {
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("MsSqlReadModelStoreDbContext");
+            MsSqlSettings msSqlReadModelStoreSettings = new(readModelStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMsSqlReadModelStore<MsSqlAppDbReadModelStoreContext, int>(
+                msSqlReadModelStoreSettings,
+                typeof(ProductValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
         }
 
         protected IResolver ConfigureServicesWithAzureServiceBus(IConfigurationRoot configurationRoot)

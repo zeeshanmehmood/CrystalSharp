@@ -5,6 +5,11 @@
         public const string Unit = nameof(Unit);
         public const string Integration = nameof(Integration);
         public const string KurrentDbIntegration = nameof(KurrentDbIntegration);
+        public const string MsSqlIntegration = nameof(MsSqlIntegration);
+        public const string MsSqlEventStoreDbIntegration = nameof(MsSqlEventStoreDbIntegration);
+        public const string MsSqlReadModelPersistenceIntegration = nameof(MsSqlReadModelPersistenceIntegration);
+        public const string MsSqlSagaChoreographyIntegration = nameof(MsSqlSagaChoreographyIntegration);
+        public const string MsSqlSagaOrchestratorIntegration = nameof(MsSqlSagaOrchestratorIntegration);
         public const string AzureServiceBusIntegration = nameof(AzureServiceBusIntegration);
         public const string RabbitMqIntegration = nameof(RabbitMqIntegration);
     }

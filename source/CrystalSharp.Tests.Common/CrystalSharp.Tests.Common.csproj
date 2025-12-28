@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
   </ItemGroup>
 
@@ -14,6 +18,7 @@
     <ProjectReference Include="..\CrystalSharp.EventStores.KurrentDb\CrystalSharp.EventStores.KurrentDb.csproj" />
     <ProjectReference Include="..\CrystalSharp.Messaging.AzureServiceBus\CrystalSharp.Messaging.AzureServiceBus.csproj" />
     <ProjectReference Include="..\CrystalSharp.Messaging.RabbitMq\CrystalSharp.Messaging.RabbitMq.csproj" />
+    <ProjectReference Include="..\CrystalSharp.MsSql\CrystalSharp.MsSql.csproj" />
     <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
   </ItemGroup>
 

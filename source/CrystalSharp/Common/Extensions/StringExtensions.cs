@@ -27,6 +27,11 @@ namespace CrystalSharp.Common.Extensions
                 return isEqual;
             }
 
+            public string ToDoubleQuotes()
+            {
+                return $"\"{source}\"";
+            }
+
             public string ToCamelCase()
             {
                 string[] words = source.Split(new[] { "_", " " }, StringSplitOptions.RemoveEmptyEntries);

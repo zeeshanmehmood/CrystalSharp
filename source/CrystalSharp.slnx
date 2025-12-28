@@ -1,10 +1,15 @@
 <Solution>
+  <Project Path="CrystalSharp.Dapper.Common/CrystalSharp.Dapper.Common.csproj" Id="7e5f3463-4f6d-4bf0-8c29-e27096d2740c" />
+  <Project Path="CrystalSharp.EntityFrameworkCore.Common/CrystalSharp.EntityFrameworkCore.Common.csproj" Id="65ba70c6-7d9c-48a6-8756-154aed85e38b" />
   <Project Path="CrystalSharp.EventStores.KurrentDb.Tests/CrystalSharp.EventStores.KurrentDb.Tests.csproj" Id="2ad22c86-a413-428f-96bf-9485bfb8662d" />
   <Project Path="CrystalSharp.EventStores.KurrentDb/CrystalSharp.EventStores.KurrentDb.csproj" Id="710cb895-a2f6-470b-af2a-519b5c461d91" />
   <Project Path="CrystalSharp.Messaging.AzureServiceBus.Tests/CrystalSharp.Messaging.AzureServiceBus.Tests.csproj" Id="1aa43535-73e3-4c45-91c9-e3f06a33b4e1" />
   <Project Path="CrystalSharp.Messaging.AzureServiceBus/CrystalSharp.Messaging.AzureServiceBus.csproj" Id="60e9894c-71c4-490f-9820-e336f2a53695" />
   <Project Path="CrystalSharp.Messaging.RabbitMq.Tests/CrystalSharp.Messaging.RabbitMq.Tests.csproj" Id="2c17fcdd-417a-4156-8901-fd343ea9c36c" />
   <Project Path="CrystalSharp.Messaging.RabbitMq/CrystalSharp.Messaging.RabbitMq.csproj" Id="8c4387e7-c668-4d99-b901-1207e85ef05c" />
+  <Project Path="CrystalSharp.MsSql.Tests/CrystalSharp.MsSql.Tests.csproj" Id="db082f15-29ae-45bd-8914-d76d170d9bb4" />
+  <Project Path="CrystalSharp.MsSql/CrystalSharp.MsSql.csproj" Id="2bc49be1-262c-41f4-bf60-1b585a4dc374" />
+  <Project Path="CrystalSharp.Sql.Common/CrystalSharp.Sql.Common.csproj" Id="76ad4421-4cdf-47ff-bec8-540cbfa02d0e" />
   <Project Path="CrystalSharp.Tests.Common/CrystalSharp.Tests.Common.csproj" Id="b7be70ee-8a73-41d0-9427-de53d18c7260" />
   <Project Path="CrystalSharp/CrystalSharp.csproj" Id="a60f24da-75fe-4ee8-a89a-89e5e5f842ec" />
 </Solution>
