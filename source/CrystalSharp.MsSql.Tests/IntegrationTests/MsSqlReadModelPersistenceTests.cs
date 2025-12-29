@@ -425,7 +425,7 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             VirtualShopReadModel product = VirtualShopReadModel.Create(sampleProductName, sampleProductPrice);
 
             // Act
-            await sut.Store(product).ConfigureAwait(false);
+            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
             VirtualShopReadModel result = await sut.Find<VirtualShopReadModel>(product.GlobalUId, false, CancellationToken.None).ConfigureAwait(false);
 
             // Assert

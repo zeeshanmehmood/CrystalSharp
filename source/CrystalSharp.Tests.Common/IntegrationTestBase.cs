@@ -7,9 +7,15 @@ using CrystalSharp.MsSql.Extensions;
 using CrystalSharp.MsSql.Migrator;
 using CrystalSharp.MsSql.Settings;
 using CrystalSharp.MsSql.Stores;
+using CrystalSharp.PostgreSql.Extensions;
+using CrystalSharp.PostgreSql.Migrator;
+using CrystalSharp.PostgreSql.Settings;
+using CrystalSharp.PostgreSql.Stores;
 using CrystalSharp.Tests.Common.Envoy.Requests;
 using CrystalSharp.Tests.Common.MsSql.Infrastructure;
 using CrystalSharp.Tests.Common.MsSql.Interceptors;
+using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
+using CrystalSharp.Tests.Common.PostgreSql.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +55,27 @@ namespace CrystalSharp.Tests.Common
         {
             Resolver = ConfigureServicesWithMsSqlReadModelStore(_configurationRoot);
             MsSqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<MsSqlAppDbReadModelStoreContext>();
+
+            readModelStoreDbContext.Database.Migrate();
+        }
+
+        protected void ConfigurePostgreSql()
+        {
+            Resolver = ConfigureServicesWithPostgreSql(_configurationRoot);
+            PostgreSqlAppDbContext dbContext = GetService<PostgreSqlAppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
+
+        protected void ConfigurePostgreSqlEventStore()
+        {
+            Resolver = ConfigureServicesWithPostgreSqlEventStore(_configurationRoot);
+        }
+
+        protected void ConfigurePostgreSqlReadModelStore()
+        {
+            Resolver = ConfigureServicesWithPostgreSqlReadModelStore(_configurationRoot);
+            PostgreSqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<PostgreSqlAppDbReadModelStoreContext>();
 
             readModelStoreDbContext.Database.Migrate();
         }
@@ -128,6 +155,52 @@ namespace CrystalSharp.Tests.Common
             IResolver resolver = crystalSharpAdapter.AddMsSqlReadModelStore<MsSqlAppDbReadModelStoreContext, int>(
                 msSqlReadModelStoreSettings,
                 typeof(ProductValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithPostgreSql(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("PostgreSqlDbContext");
+            PostgreSqlSettings postgreSqlSettings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddScoped<IPostgreSqlDataContext>(s => s.GetRequiredService<PostgreSqlAppDbContext>());
+
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddPostgreSql<PostgreSqlAppDbContext>(
+                postgreSqlSettings,
+                typeof(DepartmentNameValidatorInterceptor),
+                typeof(ReceiptCodeValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithPostgreSqlEventStore(IConfigurationRoot configurationRoot)
+        {
+            string eventStoreConnectionString = configurationRoot.GetConnectionString("PostgreSqlEventStoreDb");
+            PostgreSqlSettings postgreSqlEventStoreSettings = new(eventStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddPostgreSqlEventStoreDb<int>(postgreSqlEventStoreSettings).CreateResolver();
+            IPostgreSqlDatabaseMigrator postgreSqlDatabaseMigrator = resolver.Resolve<IPostgreSqlDatabaseMigrator>();
+
+            PostgreSqlEventStoreSetup.Run(postgreSqlDatabaseMigrator, postgreSqlEventStoreSettings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithPostgreSqlReadModelStore(IConfigurationRoot configurationRoot)
+        {
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("PostgreSqlReadModelStoreDbContext");
+            PostgreSqlSettings postgreSqlReadModelStoreSettings = new(readModelStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddPostgreSqlReadModelStore<PostgreSqlAppDbReadModelStoreContext, int>(
+                postgreSqlReadModelStoreSettings,
+                typeof(DepartmentValidatorInterceptor))
                 .CreateResolver();
 
             return resolver;

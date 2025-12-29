@@ -9,6 +9,8 @@
   <Project Path="CrystalSharp.Messaging.RabbitMq/CrystalSharp.Messaging.RabbitMq.csproj" Id="8c4387e7-c668-4d99-b901-1207e85ef05c" />
   <Project Path="CrystalSharp.MsSql.Tests/CrystalSharp.MsSql.Tests.csproj" Id="db082f15-29ae-45bd-8914-d76d170d9bb4" />
   <Project Path="CrystalSharp.MsSql/CrystalSharp.MsSql.csproj" Id="2bc49be1-262c-41f4-bf60-1b585a4dc374" />
+  <Project Path="CrystalSharp.PostgreSql.Tests/CrystalSharp.PostgreSql.Tests.csproj" Id="8239b78e-5575-48af-ac31-29f95e41ed0e" />
+  <Project Path="CrystalSharp.PostgreSql/CrystalSharp.PostgreSql.csproj" Id="067b3315-10d6-49fb-80f2-dc3d2cf38d40" />
   <Project Path="CrystalSharp.Sql.Common/CrystalSharp.Sql.Common.csproj" Id="76ad4421-4cdf-47ff-bec8-540cbfa02d0e" />
   <Project Path="CrystalSharp.Tests.Common/CrystalSharp.Tests.Common.csproj" Id="b7be70ee-8a73-41d0-9427-de53d18c7260" />
   <Project Path="CrystalSharp/CrystalSharp.csproj" Id="a60f24da-75fe-4ee8-a89a-89e5e5f842ec" />

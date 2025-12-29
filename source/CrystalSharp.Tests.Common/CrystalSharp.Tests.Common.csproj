@@ -19,6 +19,7 @@
     <ProjectReference Include="..\CrystalSharp.Messaging.AzureServiceBus\CrystalSharp.Messaging.AzureServiceBus.csproj" />
     <ProjectReference Include="..\CrystalSharp.Messaging.RabbitMq\CrystalSharp.Messaging.RabbitMq.csproj" />
     <ProjectReference Include="..\CrystalSharp.MsSql\CrystalSharp.MsSql.csproj" />
+    <ProjectReference Include="..\CrystalSharp.PostgreSql\CrystalSharp.PostgreSql.csproj" />
     <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
   </ItemGroup>
 

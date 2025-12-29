@@ -171,7 +171,6 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             string testInvoiceCode = Invoice.GetTestInvoiceCode();
             Invoice invoice = Invoice.Create(sampleInvoiceCode);
             invoice.AddLineItem("Headset", 5, 20.25M);
-            decimal amount = invoice.TotalAmount;
             invoice.Validate();
             await sut.Invoice.AddAsync(invoice, CancellationToken.None).ConfigureAwait(false);
 
