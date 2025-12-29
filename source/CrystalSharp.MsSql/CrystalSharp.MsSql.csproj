@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\Script0001_Create_Table_EventStore.sql" />
+    <None Remove="Scripts\Script0002_Create_Table_SnapshotStore.sql" />
+    <None Remove="Scripts\Script0003_Create_Table_SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\Script0001_Create_Table_EventStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0002_Create_Table_SnapshotStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0003_Create_Table_SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="6.0.16" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
