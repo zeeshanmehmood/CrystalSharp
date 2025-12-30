@@ -7,6 +7,10 @@ using CrystalSharp.MsSql.Extensions;
 using CrystalSharp.MsSql.Migrator;
 using CrystalSharp.MsSql.Settings;
 using CrystalSharp.MsSql.Stores;
+using CrystalSharp.MySql.Extensions;
+using CrystalSharp.MySql.Migrator;
+using CrystalSharp.MySql.Settings;
+using CrystalSharp.MySql.Stores;
 using CrystalSharp.PostgreSql.Extensions;
 using CrystalSharp.PostgreSql.Migrator;
 using CrystalSharp.PostgreSql.Settings;
@@ -14,6 +18,8 @@ using CrystalSharp.PostgreSql.Stores;
 using CrystalSharp.Tests.Common.Envoy.Requests;
 using CrystalSharp.Tests.Common.MsSql.Infrastructure;
 using CrystalSharp.Tests.Common.MsSql.Interceptors;
+using CrystalSharp.Tests.Common.MySql.Infrastructure;
+using CrystalSharp.Tests.Common.MySql.Interceptors;
 using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
 using CrystalSharp.Tests.Common.PostgreSql.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +82,27 @@ namespace CrystalSharp.Tests.Common
         {
             Resolver = ConfigureServicesWithPostgreSqlReadModelStore(_configurationRoot);
             PostgreSqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<PostgreSqlAppDbReadModelStoreContext>();
+
+            readModelStoreDbContext.Database.Migrate();
+        }
+
+        protected void ConfigureMySql()
+        {
+            Resolver = ConfigureServicesWithMySql(_configurationRoot);
+            MySqlAppDbContext dbContext = GetService<MySqlAppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
+
+        protected void ConfigureMySqlEventStore()
+        {
+            Resolver = ConfigureServicesWithMySqlEventStore(_configurationRoot);
+        }
+
+        protected void ConfigureMySqlReadModelStore()
+        {
+            Resolver = ConfigureServicesWithMySqlReadModelStore(_configurationRoot);
+            MySqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<MySqlAppDbReadModelStoreContext>();
 
             readModelStoreDbContext.Database.Migrate();
         }
@@ -201,6 +228,52 @@ namespace CrystalSharp.Tests.Common
             IResolver resolver = crystalSharpAdapter.AddPostgreSqlReadModelStore<PostgreSqlAppDbReadModelStoreContext, int>(
                 postgreSqlReadModelStoreSettings,
                 typeof(DepartmentValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMySql(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MySqlDbContext");
+            MySqlSettings mySqlSettings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddScoped<IMySqlDataContext>(s => s.GetRequiredService<MySqlAppDbContext>());
+
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMySql<MySqlAppDbContext>(
+                mySqlSettings,
+                typeof(SupplierNameValidatorInterceptor),
+                typeof(PurchaseOrderCodeValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMySqlEventStore(IConfigurationRoot configurationRoot)
+        {
+            string eventStoreConnectionString = configurationRoot.GetConnectionString("MySqlEventStoreDb");
+            MySqlSettings mySqlEventStoreSettings = new(eventStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMySqlEventStoreDb<int>(mySqlEventStoreSettings).CreateResolver();
+            IMySqlDatabaseMigrator mySqlDatabaseMigrator = resolver.Resolve<IMySqlDatabaseMigrator>();
+
+            MySqlEventStoreSetup.Run(mySqlDatabaseMigrator, mySqlEventStoreSettings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMySqlReadModelStore(IConfigurationRoot configurationRoot)
+        {
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("MySqlReadModelStoreDbContext");
+            MySqlSettings mySqlReadModelStoreSettings = new(readModelStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddMySqlReadModelStore<MySqlAppDbReadModelStoreContext, int>(
+                mySqlReadModelStoreSettings,
+                typeof(SupplierValidatorInterceptor))
                 .CreateResolver();
 
             return resolver;

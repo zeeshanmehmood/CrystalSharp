@@ -176,7 +176,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
 
             // Act
             await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Receipt result = await sut.Receipt.SingleOrDefaultAsync(x => x.GlobalUId == receipt.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            Receipt result = await sut.Receipt
+                .Include(x => x.InventoryItems)
+                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, CancellationToken.None)
+                .ConfigureAwait(false);
 
             // Assert
             result.Code.Should().Be(testReceiptCode);

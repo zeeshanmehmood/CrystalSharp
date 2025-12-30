@@ -2,13 +2,12 @@
 using CrystalSharp.Domain.EventDispatching;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors.Exceptions;
-using CrystalSharp.Infrastructure;
 using CrystalSharp.Infrastructure.EventStoresPersistence;
 using CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots;
 using CrystalSharp.Infrastructure.ReadModelStoresPersistence;
-using CrystalSharp.MsSql.Migrator;
-using CrystalSharp.MsSql.Settings;
-using CrystalSharp.MsSql.Stores;
+using CrystalSharp.MySql.Migrator;
+using CrystalSharp.MySql.Settings;
+using CrystalSharp.MySql.Stores;
 using CrystalSharp.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -19,13 +18,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CrystalSharp.MsSql.Extensions
+namespace CrystalSharp.MySql.Extensions
 {
-    public static class CrystalSharpAdapterMsSqlExtensions
+    public static class CrystalSharpAdapterMySqlExtensions
     {
-        public static ICrystalSharpAdapter AddMsSql<TDbContext>(
+        public static ICrystalSharpAdapter AddMySql<TDbContext>(
             this ICrystalSharpAdapter crystalSharpAdapter,
-            MsSqlSettings settings,
+            MySqlSettings settings,
             params Type[] interceptors)
             where TDbContext : DbContext
         {
@@ -58,35 +57,32 @@ namespace CrystalSharp.MsSql.Extensions
                     }
                 }
 
-                options = options.UseSqlServer(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                options = options.UseMySQL(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
             });
 
             return crystalSharpAdapter;
         }
 
-        public static ICrystalSharpAdapter AddMsSqlEventStoreDb<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, MsSqlSettings settings)
+        public static ICrystalSharpAdapter AddMySqlEventStoreDb<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, MySqlSettings settings)
         {
-            AddMsSqlDatabaseMigrator(crystalSharpAdapter);
+            AddMySqlDatabaseMigrator(crystalSharpAdapter);
 
-            bool useSchema = settings.Schema.IsValidString();
-            string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Dbo).ToLower();
+            bool useSchema = false;
+            string schema = string.Empty;
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s =>
-                new MsSqlEventStore(settings.ConnectionString,
-                    useSchema,
-                    schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new MsSqlSnapshotStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s => new MySqlEventStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new MySqlSnapshotStore(settings.ConnectionString, useSchema, schema));
             crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new MsSqlAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
+                new MySqlAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
                 s.GetRequiredService<IEventStorePersistence>(),
                 s.GetRequiredService<IEventDispatcher>()));
 
             return crystalSharpAdapter;
         }
 
-        public static ICrystalSharpAdapter AddMsSqlReadModelStore<TDbContext, TKey>(
+        public static ICrystalSharpAdapter AddMySqlReadModelStore<TDbContext, TKey>(
             this ICrystalSharpAdapter crystalSharpAdapter,
-            MsSqlSettings settings,
+            MySqlSettings settings,
             params Type[] interceptors)
             where TDbContext : DbContext
         {
@@ -116,25 +112,26 @@ namespace CrystalSharp.MsSql.Extensions
                     }
                 }
 
-                options = options.UseSqlServer(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                options = options.UseMySQL(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
             });
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MsSqlReadModelStore<TDbContext, TKey>>();
+            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MySqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;
         }
 
-        public static ICrystalSharpAdapter AddMsSqlSagaStore(this ICrystalSharpAdapter crystalSharpAdapter,
-            MsSqlSettings settings,
+        public static ICrystalSharpAdapter AddMySqlSagaStore(
+            this ICrystalSharpAdapter crystalSharpAdapter,
+            MySqlSettings settings,
             params Type[] types)
         {
-            AddMsSqlDatabaseMigrator(crystalSharpAdapter);
+            AddMySqlDatabaseMigrator(crystalSharpAdapter);
 
-            bool useSchema = settings.Schema.IsValidString();
-            string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Dbo).ToLower();
+            bool useSchema = false;
+            string schema = string.Empty;
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             crystalSharpAdapter.RegisterSagas(assemblies);
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new MsSqlSagaStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new MySqlSagaStore(settings.ConnectionString, useSchema, schema));
 
             return crystalSharpAdapter;
         }
@@ -149,9 +146,9 @@ namespace CrystalSharp.MsSql.Extensions
             }
         }
 
-        private static ICrystalSharpAdapter AddMsSqlDatabaseMigrator(ICrystalSharpAdapter crystalSharpAdapter)
+        private static ICrystalSharpAdapter AddMySqlDatabaseMigrator(ICrystalSharpAdapter crystalSharpAdapter)
         {
-            crystalSharpAdapter.ServiceCollection.TryAddTransient<IMsSqlDatabaseMigrator, MsSqlDatabaseMigrator>();
+            crystalSharpAdapter.ServiceCollection.TryAddTransient<IMySqlDatabaseMigrator, MySqlDatabaseMigrator>();
 
             return crystalSharpAdapter;
         }

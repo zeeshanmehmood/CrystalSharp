@@ -131,7 +131,6 @@ namespace CrystalSharp.PostgreSql.Extensions
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             crystalSharpAdapter.RegisterSagas(assemblies);
-
             crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new PostgreSqlSagaStore(settings.ConnectionString, useSchema, schema));
 
             return crystalSharpAdapter;

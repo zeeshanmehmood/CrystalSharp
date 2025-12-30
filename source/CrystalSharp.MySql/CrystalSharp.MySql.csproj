@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Scripts\Script0001_Create_Table_EventStore.sql" />
+    <None Remove="Scripts\Script0002_Create_Table_SnapshotStore.sql" />
+    <None Remove="Scripts\Script0003_Create_Table_SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\Script0001_Create_Table_EventStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0002_Create_Table_SnapshotStore.sql" />
+    <EmbeddedResource Include="Scripts\Script0003_Create_Table_SagaTransaction.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-mysql" Version="6.1.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrystalSharp.Dapper.Common\CrystalSharp.Dapper.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp.EntityFrameworkCore.Common\CrystalSharp.EntityFrameworkCore.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Sql.Common\CrystalSharp.Sql.Common.csproj" />
+    <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
+  </ItemGroup>
+
+</Project>
