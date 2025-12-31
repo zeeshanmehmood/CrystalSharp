@@ -20,6 +20,7 @@
     <ProjectReference Include="..\CrystalSharp.Messaging.RabbitMq\CrystalSharp.Messaging.RabbitMq.csproj" />
     <ProjectReference Include="..\CrystalSharp.MsSql\CrystalSharp.MsSql.csproj" />
     <ProjectReference Include="..\CrystalSharp.MySql\CrystalSharp.MySql.csproj" />
+    <ProjectReference Include="..\CrystalSharp.Oracle\CrystalSharp.Oracle.csproj" />
     <ProjectReference Include="..\CrystalSharp.PostgreSql\CrystalSharp.PostgreSql.csproj" />
     <ProjectReference Include="..\CrystalSharp\CrystalSharp.csproj" />
   </ItemGroup>

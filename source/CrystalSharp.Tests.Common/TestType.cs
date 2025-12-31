@@ -10,6 +10,8 @@
         public const string MsSqlReadModelPersistenceIntegration = nameof(MsSqlReadModelPersistenceIntegration);
         public const string MsSqlSagaChoreographyIntegration = nameof(MsSqlSagaChoreographyIntegration);
         public const string MsSqlSagaOrchestratorIntegration = nameof(MsSqlSagaOrchestratorIntegration);
+        public const string OracleIntegration = nameof(OracleIntegration);
+        public const string OracleReadModelPersistenceIntegration = nameof(OracleReadModelPersistenceIntegration);
         public const string PostgreSqlIntegration = nameof(PostgreSqlIntegration);
         public const string PostgreSqlEventStoreDbIntegration = nameof(PostgreSqlEventStoreDbIntegration);
         public const string PostgreSqlReadModelPersistenceIntegration = nameof(PostgreSqlReadModelPersistenceIntegration);

@@ -11,6 +11,8 @@ using CrystalSharp.MySql.Extensions;
 using CrystalSharp.MySql.Migrator;
 using CrystalSharp.MySql.Settings;
 using CrystalSharp.MySql.Stores;
+using CrystalSharp.Oracle.Extensions;
+using CrystalSharp.Oracle.Settings;
 using CrystalSharp.PostgreSql.Extensions;
 using CrystalSharp.PostgreSql.Migrator;
 using CrystalSharp.PostgreSql.Settings;
@@ -20,6 +22,8 @@ using CrystalSharp.Tests.Common.MsSql.Infrastructure;
 using CrystalSharp.Tests.Common.MsSql.Interceptors;
 using CrystalSharp.Tests.Common.MySql.Infrastructure;
 using CrystalSharp.Tests.Common.MySql.Interceptors;
+using CrystalSharp.Tests.Common.Oracle.Infrastructure;
+using CrystalSharp.Tests.Common.Oracle.Interceptors;
 using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
 using CrystalSharp.Tests.Common.PostgreSql.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +65,22 @@ namespace CrystalSharp.Tests.Common
         {
             Resolver = ConfigureServicesWithMsSqlReadModelStore(_configurationRoot);
             MsSqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<MsSqlAppDbReadModelStoreContext>();
+
+            readModelStoreDbContext.Database.Migrate();
+        }
+
+        protected void ConfigureOracle()
+        {
+            Resolver = ConfigureServicesWithOracle(_configurationRoot);
+            OracleAppDbContext dbContext = GetService<OracleAppDbContext>();
+
+            dbContext.Database.Migrate();
+        }
+
+        protected void ConfigureOracleReadModelStore()
+        {
+            Resolver = ConfigureServicesWithOracleReadModelStore(_configurationRoot);
+            OracleAppDbReadModelStoreContext readModelStoreDbContext = GetService<OracleAppDbReadModelStoreContext>();
 
             readModelStoreDbContext.Database.Migrate();
         }
@@ -182,6 +202,38 @@ namespace CrystalSharp.Tests.Common
             IResolver resolver = crystalSharpAdapter.AddMsSqlReadModelStore<MsSqlAppDbReadModelStoreContext, int>(
                 msSqlReadModelStoreSettings,
                 typeof(ProductValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithOracle(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("OracleDbContext");
+            OracleSettings oracleSettings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddScoped<IOracleDataContext>(s => s.GetRequiredService<OracleAppDbContext>());
+
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddOracle<OracleAppDbContext>(
+                oracleSettings,
+                typeof(EmployeeNameValidatorInterceptor),
+                typeof(SaleOrderCodeValidatorInterceptor))
+                .CreateResolver();
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithOracleReadModelStore(IConfigurationRoot configurationRoot)
+        {
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("OracleReadModelStoreDbContext"); ;
+            OracleSettings oracleReadModelStoreSettings = new(readModelStoreConnectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+            IResolver resolver = crystalSharpAdapter.AddOracleReadModelStore<OracleAppDbReadModelStoreContext, int>(
+                oracleReadModelStoreSettings,
+                typeof(CustomerValidatorInterceptor))
                 .CreateResolver();
 
             return resolver;
