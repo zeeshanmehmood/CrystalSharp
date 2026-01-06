@@ -17,6 +17,7 @@
   <Project Path="CrystalSharp.Oracle/CrystalSharp.Oracle.csproj" Id="ffe54c32-ed10-4576-a40b-1dd89aa854a4" />
   <Project Path="CrystalSharp.PostgreSql.Tests/CrystalSharp.PostgreSql.Tests.csproj" Id="8239b78e-5575-48af-ac31-29f95e41ed0e" />
   <Project Path="CrystalSharp.PostgreSql/CrystalSharp.PostgreSql.csproj" Id="067b3315-10d6-49fb-80f2-dc3d2cf38d40" />
+  <Project Path="CrystalSharp.Sagas.Tests/CrystalSharp.Sagas.Tests.csproj" Id="2a7da4a4-bf7e-414e-afa9-96c5debed91e" />
   <Project Path="CrystalSharp.Sql.Common/CrystalSharp.Sql.Common.csproj" Id="76ad4421-4cdf-47ff-bec8-540cbfa02d0e" />
   <Project Path="CrystalSharp.Tests.Common/CrystalSharp.Tests.Common.csproj" Id="b7be70ee-8a73-41d0-9427-de53d18c7260" />
   <Project Path="CrystalSharp/CrystalSharp.csproj" Id="a60f24da-75fe-4ee8-a89a-89e5e5f842ec" />

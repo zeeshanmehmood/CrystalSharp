@@ -1,4 +1,5 @@
-﻿using CrystalSharp.EventStores.KurrentDb.Extensions;
+﻿using CrystalSharp.EntityFrameworkCore.Common.Interceptors;
+using CrystalSharp.EventStores.KurrentDb.Extensions;
 using CrystalSharp.Messaging.AzureServiceBus.Configuration;
 using CrystalSharp.Messaging.AzureServiceBus.Extensions;
 using CrystalSharp.Messaging.RabbitMq.Configuration;
@@ -28,10 +29,16 @@ using CrystalSharp.Tests.Common.Oracle.Infrastructure;
 using CrystalSharp.Tests.Common.Oracle.Interceptors;
 using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
 using CrystalSharp.Tests.Common.PostgreSql.Interceptors;
+using CrystalSharp.Tests.Common.Sagas.Choreography.OrderChoreography.Transactions;
+using CrystalSharp.Tests.Common.Sagas.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CrystalSharp.Tests.Common
 {
@@ -132,6 +139,26 @@ namespace CrystalSharp.Tests.Common
         protected void ConfigureMongoDb(string database, string eventStoreDatabase, string readModelStoreDatabase)
         {
             Resolver = ConfigureServicesWithMongoDb(_configurationRoot, database, eventStoreDatabase, readModelStoreDatabase);
+        }
+
+        protected void ConfigureMsSqlSagas()
+        {
+            Resolver = ConfigureServicesWithMsSqlSagas(_configurationRoot);
+        }
+
+        protected void ConfigurePostgreSqlSagas()
+        {
+            Resolver = ConfigureServicesWithPostgreSqlSagas(_configurationRoot);
+        }
+
+        protected void ConfigureMySqlSagas()
+        {
+            Resolver = ConfigureServicesWithMySqlSagas(_configurationRoot);
+        }
+
+        protected void ConfigureMongoDbSagas(string databaseToUse)
+        {
+            Resolver = ConfigureServicesWithMongoDbSagas(_configurationRoot, databaseToUse);
         }
 
         protected void ConfigureAzureServiceBus()
@@ -360,6 +387,97 @@ namespace CrystalSharp.Tests.Common
                 .CreateResolver();
         }
 
+        protected IResolver ConfigureServicesWithMsSqlSagas(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MsSqlSagasConnectionString");
+            MsSqlSettings settings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
+            {
+                List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
+
+                options.UseInMemoryDatabase("crystalsharp-mssql-data-inmemory").AddInterceptors(interceptors);
+            });
+            crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+
+            IResolver resolver = crystalSharpAdapter.AddMsSqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IMsSqlDatabaseMigrator msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
+
+            MsSqlSagaStoreSetup.Run(msSqlDatabaseMigrator, settings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithPostgreSqlSagas(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("PostgreSqlSagasConnectionString");
+            PostgreSqlSettings settings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
+            {
+                List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
+
+                options.UseInMemoryDatabase("crystalsharp-postgresql-data-inmemory").AddInterceptors(interceptors);
+            });
+            crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+
+            IResolver resolver = crystalSharpAdapter.AddPostgreSqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IPostgreSqlDatabaseMigrator postgreSqlDatabaseMigrator = resolver.Resolve<IPostgreSqlDatabaseMigrator>();
+
+            PostgreSqlSagaStoreSetup.Run(postgreSqlDatabaseMigrator, settings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMySqlSagas(IConfigurationRoot configurationRoot)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MySqlSagasConnectionString");
+            MySqlSettings settings = new(connectionString);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
+            {
+                List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
+
+                options.UseInMemoryDatabase("crystalsharp-mysql-data-inmemory").AddInterceptors(interceptors);
+            });
+            crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+
+            IResolver resolver = crystalSharpAdapter.AddMySqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IMySqlDatabaseMigrator mySqlDatabaseMigrator = resolver.Resolve<IMySqlDatabaseMigrator>();
+
+            MySqlSagaStoreSetup.Run(mySqlDatabaseMigrator, settings.ConnectionString);
+
+            return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMongoDbSagas(IConfigurationRoot configurationRoot, string databaseToUse)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MongoDbSagasConnectionString");
+            MongoDbSettings settings = new(connectionString, databaseToUse);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
+            {
+                List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
+
+                options.UseInMemoryDatabase("crystalsharp-mongodb-data-inmemory").AddInterceptors(interceptors);
+            });
+            crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+
+            return crystalSharpAdapter.AddMongoDbSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+        }
+
         protected IResolver ConfigureServicesWithAzureServiceBus(IConfigurationRoot configurationRoot)
         {
             string configurationSection = "AppConfiguration:AzureServiceBusConfiguration:";
@@ -390,6 +508,24 @@ namespace CrystalSharp.Tests.Common
         protected T GetService<T>()
         {
             return Resolver.Resolve<T>();
+        }
+
+        private void RegisterDateTractionAndEventDispatcherInterceptors(ICrystalSharpAdapter crystalSharpAdapter)
+        {
+            ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));
+            ServiceDescriptor dispatchDomainEventsInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DispatchDomainEventsInterceptor));
+
+            if (dateTractionInterceptorDescriptor is null)
+            {
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+            }
+
+            if (dispatchDomainEventsInterceptorDescriptor is null)
+            {
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            }
         }
 
         private ICrystalSharpAdapter ConfigureCrystalSharpAdapter(IServiceCollection services)
