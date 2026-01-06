@@ -1,0 +1,13 @@
+﻿using CrystalSharp.Domain.EventDispatching;
+using CrystalSharp.Infrastructure.EventStoresPersistence;
+
+namespace CrystalSharp.MongoDb.Stores
+{
+    public class MongoDbAggregateEventStore<TKey>(
+        IResolver resolver,
+        IEventStorePersistence eventStorePersistence,
+        IEventDispatcher eventDispatcher) : AggregateEventStore<TKey>(resolver, eventStorePersistence, eventDispatcher), IAggregateEventStore<TKey>
+    {
+        //
+    }
+}

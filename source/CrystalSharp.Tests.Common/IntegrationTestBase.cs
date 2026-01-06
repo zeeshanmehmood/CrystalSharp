@@ -3,6 +3,8 @@ using CrystalSharp.Messaging.AzureServiceBus.Configuration;
 using CrystalSharp.Messaging.AzureServiceBus.Extensions;
 using CrystalSharp.Messaging.RabbitMq.Configuration;
 using CrystalSharp.Messaging.RabbitMq.Extensions;
+using CrystalSharp.MongoDb.Extensions;
+using CrystalSharp.MongoDb.Settings;
 using CrystalSharp.MsSql.Extensions;
 using CrystalSharp.MsSql.Migrator;
 using CrystalSharp.MsSql.Settings;
@@ -125,6 +127,11 @@ namespace CrystalSharp.Tests.Common
             MySqlAppDbReadModelStoreContext readModelStoreDbContext = GetService<MySqlAppDbReadModelStoreContext>();
 
             readModelStoreDbContext.Database.Migrate();
+        }
+
+        protected void ConfigureMongoDb(string database, string eventStoreDatabase, string readModelStoreDatabase)
+        {
+            Resolver = ConfigureServicesWithMongoDb(_configurationRoot, database, eventStoreDatabase, readModelStoreDatabase);
         }
 
         protected void ConfigureAzureServiceBus()
@@ -329,6 +336,28 @@ namespace CrystalSharp.Tests.Common
                 .CreateResolver();
 
             return resolver;
+        }
+
+        protected IResolver ConfigureServicesWithMongoDb(
+            IConfigurationRoot configurationRoot,
+            string database,
+            string eventStoreDatabase,
+            string readModelStoreDatabase)
+        {
+            string connectionString = configurationRoot.GetConnectionString("MongoDbConnectionString");
+            string eventStoreConnectionString = configurationRoot.GetConnectionString("MongoDbEventStoreConnectionString");
+            string readModelStoreConnectionString = configurationRoot.GetConnectionString("MongoDbReadModelStoreConnectionString");
+            MongoDbSettings mongoDbSettings = new(connectionString, database);
+            MongoDbSettings mongoDbEventStoreSettings = new(eventStoreConnectionString, eventStoreDatabase);
+            MongoDbSettings mongoDbReadModelStoreSettings = new(readModelStoreConnectionString, readModelStoreDatabase);
+
+            IServiceCollection serviceCollection = new ServiceCollection();
+            ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
+
+            return crystalSharpAdapter.AddMongoDb(mongoDbSettings)
+                .AddMongoDbEventStoreDb<string>(mongoDbEventStoreSettings)
+                .AddMongoDbReadModelStore(mongoDbReadModelStoreSettings)
+                .CreateResolver();
         }
 
         protected IResolver ConfigureServicesWithAzureServiceBus(IConfigurationRoot configurationRoot)

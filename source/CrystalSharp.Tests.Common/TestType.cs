@@ -22,6 +22,11 @@
         public const string MySqlReadModelPersistenceIntegration = nameof(MySqlReadModelPersistenceIntegration);
         public const string MySqlSagaChoreographyIntegration = nameof(MySqlSagaChoreographyIntegration);
         public const string MySqlSagaOrchestratorIntegration = nameof(MySqlSagaOrchestratorIntegration);
+        public const string MongoDbIntegration = nameof(MongoDbIntegration);
+        public const string MongoDbEventStoreDbIntegration = nameof(MongoDbEventStoreDbIntegration);
+        public const string MongoDbReadModelPersistenceIntegration = nameof(MongoDbReadModelPersistenceIntegration);
+        public const string MongoDbSagaChoreographyIntegration = nameof(MongoDbSagaChoreographyIntegration);
+        public const string MongoDbSagaOrchestratorIntegration = nameof(MongoDbSagaOrchestratorIntegration);
         public const string AzureServiceBusIntegration = nameof(AzureServiceBusIntegration);
         public const string RabbitMqIntegration = nameof(RabbitMqIntegration);
     }

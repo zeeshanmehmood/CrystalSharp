@@ -7,6 +7,8 @@
   <Project Path="CrystalSharp.Messaging.AzureServiceBus/CrystalSharp.Messaging.AzureServiceBus.csproj" Id="60e9894c-71c4-490f-9820-e336f2a53695" />
   <Project Path="CrystalSharp.Messaging.RabbitMq.Tests/CrystalSharp.Messaging.RabbitMq.Tests.csproj" Id="2c17fcdd-417a-4156-8901-fd343ea9c36c" />
   <Project Path="CrystalSharp.Messaging.RabbitMq/CrystalSharp.Messaging.RabbitMq.csproj" Id="8c4387e7-c668-4d99-b901-1207e85ef05c" />
+  <Project Path="CrystalSharp.MongoDb.Tests/CrystalSharp.MongoDb.Tests.csproj" Id="0995bd2f-535e-4b00-92bf-fab2e13138e9" />
+  <Project Path="CrystalSharp.MongoDb/CrystalSharp.MongoDb.csproj" Id="7a230f5e-d930-4d6a-9cb8-4e92b233bc6a" />
   <Project Path="CrystalSharp.MsSql.Tests/CrystalSharp.MsSql.Tests.csproj" Id="db082f15-29ae-45bd-8914-d76d170d9bb4" />
   <Project Path="CrystalSharp.MsSql/CrystalSharp.MsSql.csproj" Id="2bc49be1-262c-41f4-bf60-1b585a4dc374" />
   <Project Path="CrystalSharp.MySql.Tests/CrystalSharp.MySql.Tests.csproj" Id="fdfdfb4f-2b39-4314-904e-482806eb1030" />
