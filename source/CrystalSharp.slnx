@@ -20,5 +20,6 @@
   <Project Path="CrystalSharp.Sagas.Tests/CrystalSharp.Sagas.Tests.csproj" Id="2a7da4a4-bf7e-414e-afa9-96c5debed91e" />
   <Project Path="CrystalSharp.Sql.Common/CrystalSharp.Sql.Common.csproj" Id="76ad4421-4cdf-47ff-bec8-540cbfa02d0e" />
   <Project Path="CrystalSharp.Tests.Common/CrystalSharp.Tests.Common.csproj" Id="b7be70ee-8a73-41d0-9427-de53d18c7260" />
+  <Project Path="CrystalSharp.Tests/CrystalSharp.Tests.csproj" Id="8a275aa3-a166-48e0-b90f-275b89a1e66b" />
   <Project Path="CrystalSharp/CrystalSharp.csproj" Id="a60f24da-75fe-4ee8-a89a-89e5e5f842ec" />
 </Solution>
