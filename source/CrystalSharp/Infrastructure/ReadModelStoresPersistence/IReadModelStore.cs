@@ -32,7 +32,8 @@ namespace CrystalSharp.Infrastructure.ReadModelStoresPersistence
         Task<T> Find<T>(Guid globalUId, bool tracking = false, CancellationToken cancellationToken = default) where T : class, IReadModel<TKey>;
         Task<IQueryable<T>> Filter<T>(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>;
-        Task<PagedResult<T>> Get<T>(int skip = 0,
+        Task<PagedResult<T>> Get<T>(
+            int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
             bool tracking = false,

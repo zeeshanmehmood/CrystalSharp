@@ -2,7 +2,8 @@
 
 namespace CrystalSharp.Messaging.RabbitMq.Configuration
 {
-    public class RabbitMqSettings(string host,
+    public class RabbitMqSettings(
+        string host,
         int port,
         string username = "",
         string password = "",

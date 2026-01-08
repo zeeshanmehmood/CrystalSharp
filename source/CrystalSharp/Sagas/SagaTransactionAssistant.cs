@@ -1,4 +1,5 @@
-﻿using CrystalSharp.Envoy.Contracts;
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Envoy.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,7 +8,8 @@ namespace CrystalSharp.Sagas
     public abstract class SagaTransactionAssistant<TRequest> : SagaTransactionHandler<TRequest>
         where TRequest : IRequest<SagaTransactionResult>
     {
-        protected async Task<SagaTransactionMeta> GetSagaTransaction(ISagaStore sagaStore,
+        protected async Task<SagaTransactionMeta> GetSagaTransaction(
+            ISagaStore sagaStore,
             string sagaId,
             string startedBy,
             string step,
@@ -36,7 +38,7 @@ namespace CrystalSharp.Sagas
             {
                 sagaTransactionMeta.State = success ? SagaState.Committed : SagaState.Aborted;
 
-                if (!string.IsNullOrEmpty(errorTrail))
+                if (errorTrail.IsValidString())
                 {
                     sagaTransactionMeta.ErrorTrail = errorTrail;
                 }
@@ -50,7 +52,8 @@ namespace CrystalSharp.Sagas
             return new SagaTransactionMeta { CorrelationId = sagaId, StartedBy = startedBy, Step = step, State = SagaState.New };
         }
 
-        protected async Task<SagaTransactionMeta> ExistingSagaTransaction(ISagaStore sagaStore,
+        protected async Task<SagaTransactionMeta> ExistingSagaTransaction(
+            ISagaStore sagaStore,
             string sagaId,
             CancellationToken cancellationToken = default)
         {

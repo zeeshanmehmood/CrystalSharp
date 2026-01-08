@@ -62,7 +62,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots
                 Data = Serializer.Serialize(snapshot)
             };
 
-            (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.SetSnapshotQuery(dbSnapshotEntity.SnapshotId,
+            (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.SetSnapshotQuery(
+                dbSnapshotEntity.SnapshotId,
                 dbSnapshotEntity.SnapshotAssembly,
                 dbSnapshotEntity.SnapshotVersion,
                 dbSnapshotEntity.StreamName,

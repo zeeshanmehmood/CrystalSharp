@@ -37,7 +37,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots.Exception
             ErrorCode = errorCode;
         }
 
-        public SnapshotVersionConflictException(string stream,
+        public SnapshotVersionConflictException(
+            string stream,
             long lastVersion,
             long expectedVersion,
             int errorCode,

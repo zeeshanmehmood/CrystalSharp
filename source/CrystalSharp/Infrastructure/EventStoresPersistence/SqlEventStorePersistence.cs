@@ -77,7 +77,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return lastEvent;
         }
 
-        public async Task Store<TEvent>(string stream,
+        public async Task Store<TEvent>(
+            string stream,
             IEnumerable<EventDataItem<TEvent>> eventsData,
             long expectedVersion,
             CancellationToken cancellationToken = default)
@@ -104,7 +105,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
 
             foreach (IDbDomainEvent @event in eventsToSave)
             {
-                (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.StoreEventQuery(Guid.Create(),
+                (string query, IDictionary<string, object> dataParameters) = _eventStoreQuery.StoreEventQuery(
+                    Guid.Create(),
                     @event.StreamId,
                     @event.StreamName,
                     ++lastSequence,

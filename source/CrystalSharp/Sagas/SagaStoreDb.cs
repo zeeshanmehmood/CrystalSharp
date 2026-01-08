@@ -40,7 +40,8 @@ namespace CrystalSharp.Sagas
             if (!existing)
             {
                 sagaTransactionMeta.CreatedAt = SystemDate.UtcNow;
-                (string query, IDictionary<string, object> dataParameters) = _sagaStoreQuery.StoreTransactionQuery(sagaTransactionMeta.Id,
+                (string query, IDictionary<string, object> dataParameters) = _sagaStoreQuery.StoreTransactionQuery(
+                    sagaTransactionMeta.Id,
                     sagaTransactionMeta.CorrelationId,
                     sagaTransactionMeta.StartedBy,
                     sagaTransactionMeta.Step,
@@ -53,7 +54,8 @@ namespace CrystalSharp.Sagas
             else
             {
                 sagaTransactionMeta.ModifiedOn = SystemDate.UtcNow;
-                (string query, IDictionary<string, object> dataParameters) = _sagaStoreQuery.ChangeTransactionStateQuery(sagaTransactionMeta.CorrelationId,
+                (string query, IDictionary<string, object> dataParameters) = _sagaStoreQuery.ChangeTransactionStateQuery(
+                    sagaTransactionMeta.CorrelationId,
                     sagaTransactionMeta.Step,
                     (int)sagaTransactionMeta.State,
                     sagaTransactionMeta.ErrorTrail,

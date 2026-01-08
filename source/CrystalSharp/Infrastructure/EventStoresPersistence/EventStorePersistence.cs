@@ -14,7 +14,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return type.ToStreamName(id);
         }
 
-        public IEnumerable<EventDataItem<TEvent>> PrepareEventData<TEvent>(IEnumerable<TEvent> list,
+        public IEnumerable<EventDataItem<TEvent>> PrepareEventData<TEvent>(
+            IEnumerable<TEvent> list,
             IDictionary<string, object> headers)
             where TEvent : class
         {

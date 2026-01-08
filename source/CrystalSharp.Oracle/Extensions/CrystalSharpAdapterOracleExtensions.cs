@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrystalSharp.Oracle.Extensions
 {
@@ -20,8 +21,7 @@ namespace CrystalSharp.Oracle.Extensions
             params Type[] interceptors)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
 
             if (interceptors.HasAny())
             {
@@ -87,7 +87,14 @@ namespace CrystalSharp.Oracle.Extensions
                     }
                 }
 
-                options = options.UseOracle(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                if (interceptorsToRegister.HasAny())
+                {
+                    options = options.UseOracle(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                }
+                else
+                {
+                    options = options.UseOracle(settings.ConnectionString);
+                }
             });
 
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, OracleReadModelStore<TDbContext, TKey>>();
@@ -102,6 +109,26 @@ namespace CrystalSharp.Oracle.Extensions
                 string errorMessage = $"{interceptor.Name} must implement the {nameof(IInterceptor).ToDoubleQuotes()} interface of Entity Framework Core.";
 
                 throw new InvalidDbInterceptorException(errorMessage);
+            }
+        }
+
+        private static void RegisterDefaultInterceptorsIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
+        {
+            ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));
+            ServiceDescriptor dispatchDomainEventsInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DispatchDomainEventsInterceptor));
+
+            if (dateTractionInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DateTractionInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+            }
+
+            if (dispatchDomainEventsInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
             }
         }
     }

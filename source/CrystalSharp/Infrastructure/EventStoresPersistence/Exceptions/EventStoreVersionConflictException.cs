@@ -37,7 +37,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Exceptions
             ErrorCode = errorCode;
         }
 
-        public EventStoreVersionConflictException(string stream,
+        public EventStoreVersionConflictException(
+            string stream,
             long lastVersion,
             long expectedVersion,
             int errorCode,

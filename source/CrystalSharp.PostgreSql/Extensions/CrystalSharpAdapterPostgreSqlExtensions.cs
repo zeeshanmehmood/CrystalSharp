@@ -29,8 +29,7 @@ namespace CrystalSharp.PostgreSql.Extensions
             params Type[] interceptors)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
 
             if (interceptors.HasAny())
             {
@@ -66,7 +65,7 @@ namespace CrystalSharp.PostgreSql.Extensions
 
         public static ICrystalSharpAdapter AddPostgreSqlEventStoreDb<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, PostgreSqlSettings settings)
         {
-            AddPostgreSqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterPostgreSqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Public).ToLower();
@@ -113,18 +112,26 @@ namespace CrystalSharp.PostgreSql.Extensions
                     }
                 }
 
-                options = options.UseNpgsql(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                if (interceptorsToRegister.HasAny())
+                {
+                    options = options.UseNpgsql(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                }
+                else
+                {
+                    options = options.UseNpgsql(settings.ConnectionString);
+                }
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, PostgreSqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;
         }
 
-        public static ICrystalSharpAdapter AddPostgreSqlSagaStore(this ICrystalSharpAdapter crystalSharpAdapter,
+        public static ICrystalSharpAdapter AddPostgreSqlSagaStore(
+            this ICrystalSharpAdapter crystalSharpAdapter,
             PostgreSqlSettings settings,
             params Type[] types)
         {
-            AddPostgreSqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterPostgreSqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Public).ToLower();
@@ -146,9 +153,35 @@ namespace CrystalSharp.PostgreSql.Extensions
             }
         }
 
-        private static ICrystalSharpAdapter AddPostgreSqlDatabaseMigrator(ICrystalSharpAdapter crystalSharpAdapter)
+        private static void RegisterDefaultInterceptorsIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
         {
-            crystalSharpAdapter.ServiceCollection.TryAddTransient<IPostgreSqlDatabaseMigrator, PostgreSqlDatabaseMigrator>();
+            ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));
+            ServiceDescriptor dispatchDomainEventsInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DispatchDomainEventsInterceptor));
+
+            if (dateTractionInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DateTractionInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+            }
+
+            if (dispatchDomainEventsInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            }
+        }
+
+        private static ICrystalSharpAdapter RegisterPostgreSqlDatabaseMigratorIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
+        {
+            ServiceDescriptor databaseMigratorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(PostgreSqlDatabaseMigrator));
+
+            if (databaseMigratorDescriptor is null)
+            {
+                crystalSharpAdapter.ServiceCollection.TryAddTransient<IPostgreSqlDatabaseMigrator, PostgreSqlDatabaseMigrator>();
+            }
 
             return crystalSharpAdapter;
         }

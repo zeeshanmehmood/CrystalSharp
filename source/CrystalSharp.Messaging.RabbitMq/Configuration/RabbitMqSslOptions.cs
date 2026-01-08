@@ -1,6 +1,7 @@
 ﻿namespace CrystalSharp.Messaging.RabbitMq.Configuration
 {
-    public class RabbitMqSslOptions(string serverName,
+    public class RabbitMqSslOptions(
+        string serverName,
         string certificatePath = "",
         bool enabled = false)
     {

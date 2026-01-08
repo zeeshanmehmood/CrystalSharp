@@ -38,7 +38,8 @@ namespace CrystalSharp.Sagas
             return (query.ToString(), parameters);
         }
 
-        public (string, IDictionary<string, object>) StoreTransactionQuery(string id,
+        public (string, IDictionary<string, object>) StoreTransactionQuery(
+            string id,
             string correlationId,
             string startedBy,
             string step,
@@ -68,7 +69,8 @@ namespace CrystalSharp.Sagas
             return (query.ToString(), parameters);
         }
 
-        public (string, IDictionary<string, object>) ChangeTransactionStateQuery(string correlationId,
+        public (string, IDictionary<string, object>) ChangeTransactionStateQuery(
+            string correlationId,
             string step,
             int state,
             string errorTrail,

@@ -118,7 +118,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return (query.ToString(), parameters);
         }
 
-        public (string, IDictionary<string, object>) StoreEventQuery(Guid id,
+        public (string, IDictionary<string, object>) StoreEventQuery(
+            Guid id,
             Guid streamId,
             string streamName,
             long sequence,
@@ -177,7 +178,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return (query.ToString(), parameters);
         }
 
-        public (string, IDictionary<string, object>) SetSnapshotQuery(Guid snapshotId,
+        public (string, IDictionary<string, object>) SetSnapshotQuery(
+            Guid snapshotId,
             string snapshotAssembly,
             long snapshotVersion,
             string streamName,

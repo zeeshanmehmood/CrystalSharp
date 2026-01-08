@@ -30,7 +30,8 @@ namespace CrystalSharp.Messaging.RabbitMq
         public IChannel ProducerChannel { get; private set; }
         public IChannel ConsumerChannel { get; private set; }
 
-        public RabbitMqMessageBroker(RabbitMqSettings settings,
+        public RabbitMqMessageBroker(
+            RabbitMqSettings settings,
             RabbitMqChannelConfiguration channelConfiguration,
             IRabbitMqConnectionFactory connectionFactory)
             : this(settings, connectionFactory)
@@ -169,7 +170,8 @@ namespace CrystalSharp.Messaging.RabbitMq
 
                 if (_channelConfiguration is not null)
                 {
-                    channelOptions = new(_channelConfiguration.PublisherConfirmationsEnabled,
+                    channelOptions = new(
+                        _channelConfiguration.PublisherConfirmationsEnabled,
                         _channelConfiguration.PublisherConfirmationTrackingEnabled,
                         _channelConfiguration.OutstandingPublisherConfirmationsRateLimiter,
                         _channelConfiguration.ConsumerDispatchConcurrency);
@@ -231,7 +233,8 @@ namespace CrystalSharp.Messaging.RabbitMq
 
         private async Task DeclareQueue(IChannel channel, GeneralQueue queue, CancellationToken cancellationToken = default)
         {
-            await channel.QueueDeclareAsync(queue: queue.Name,
+            await channel.QueueDeclareAsync(
+                queue: queue.Name,
                 durable: queue.Durable,
                 exclusive: queue.Exclusive,
                 autoDelete: queue.AutoDelete,
@@ -271,7 +274,8 @@ namespace CrystalSharp.Messaging.RabbitMq
 
         private async Task SetExchange(IChannel channel, GeneralExchange exchange, CancellationToken cancellationToken = default)
         {
-            await channel.ExchangeDeclareAsync(exchange: exchange.Name,
+            await channel.ExchangeDeclareAsync(
+                exchange: exchange.Name,
                 type: exchange.Type,
                 durable: exchange.Durable,
                 autoDelete: exchange.AutoDelete,
@@ -310,14 +314,16 @@ namespace CrystalSharp.Messaging.RabbitMq
             return Encoding.UTF8.GetString(bytes);
         }
 
-        private async Task SendToExchange(string exchange,
+        private async Task SendToExchange(
+            string exchange,
             string routingKey,
             bool mandatory,
             BasicProperties basicProperties,
             ReadOnlyMemory<byte> body,
             CancellationToken cancellationToken = default)
         {
-            await ProducerChannel.BasicPublishAsync(exchange: exchange,
+            await ProducerChannel.BasicPublishAsync(
+                exchange: exchange,
                 routingKey: routingKey,
                 mandatory: mandatory,
                 basicProperties: basicProperties,
@@ -326,14 +332,16 @@ namespace CrystalSharp.Messaging.RabbitMq
                 .ConfigureAwait(false);
         }
 
-        private async Task SendToQueue(string exchange,
+        private async Task SendToQueue(
+            string exchange,
             string queue,
             bool mandatory,
             BasicProperties basicProperties,
             ReadOnlyMemory<byte> body,
             CancellationToken cancellationToken = default)
         {
-            await ProducerChannel.BasicPublishAsync(exchange: exchange,
+            await ProducerChannel.BasicPublishAsync(
+                exchange: exchange,
                 routingKey: queue,
                 mandatory: mandatory,
                 basicProperties: basicProperties,
@@ -355,7 +363,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties("application/json");
 
             await SetExchange(ProducerChannel, message.Exchange, cancellationToken).ConfigureAwait(false);
-            await SendToExchange(message.Exchange.Name,
+            await SendToExchange(
+                message.Exchange.Name,
                 message.Exchange.RoutingKey,
                 mandatory,
                 basicProperties,
@@ -376,7 +385,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties("application/json");
 
             await SetExchange(ProducerChannel, message.Exchange, cancellationToken).ConfigureAwait(false);
-            await SendToExchange(message.Exchange.Name,
+            await SendToExchange(
+                message.Exchange.Name,
                 message.Exchange.RoutingKey,
                 mandatory,
                 basicProperties,
@@ -397,7 +407,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties();
 
             await SetExchange(ProducerChannel, message.Exchange, cancellationToken).ConfigureAwait(false);
-            await SendToExchange(message.Exchange.Name,
+            await SendToExchange(
+                message.Exchange.Name,
                 message.Exchange.RoutingKey,
                 mandatory,
                 basicProperties,
@@ -419,7 +430,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties("application/json");
 
             await SetQueue(ProducerChannel, message.Queue, cancellationToken).ConfigureAwait(false);
-            await SendToQueue(message.Queue.Exchange,
+            await SendToQueue(
+                message.Queue.Exchange,
                 message.Queue.Name,
                 mandatory,
                 basicProperties,
@@ -440,7 +452,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties("application/json");
 
             await SetQueue(ProducerChannel, message.Queue, cancellationToken).ConfigureAwait(false);
-            await SendToQueue(message.Queue.Exchange,
+            await SendToQueue(
+                message.Queue.Exchange,
                 message.Queue.Name,
                 mandatory,
                 basicProperties,
@@ -461,7 +474,8 @@ namespace CrystalSharp.Messaging.RabbitMq
             BasicProperties basicProperties = CreateBasicProperties();
 
             await SetQueue(ProducerChannel, message.Queue, cancellationToken).ConfigureAwait(false);
-            await SendToQueue(message.Queue.Exchange,
+            await SendToQueue(
+                message.Queue.Exchange,
                 message.Queue.Name,
                 mandatory,
                 basicProperties,

@@ -206,7 +206,8 @@ namespace CrystalSharp.MongoDb.Stores
             return records;
         }
 
-        public async Task<PagedResult<T>> Get<T>(int skip = 0,
+        public async Task<PagedResult<T>> Get<T>(
+            int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
             bool tracking = false,
@@ -218,7 +219,15 @@ namespace CrystalSharp.MongoDb.Stores
         {
             await Task.CompletedTask;
 
-            PagedResult<T> result = await GetRecords<T>(skip, take, predicate, recordMode, sortColumn, sortMode, cancellationToken).ConfigureAwait(false);
+            PagedResult<T> result = await GetRecords<T>(
+                skip,
+                take,
+                predicate,
+                recordMode,
+                sortColumn,
+                sortMode,
+                cancellationToken)
+                .ConfigureAwait(false);
 
             return result;
         }
@@ -486,7 +495,13 @@ namespace CrystalSharp.MongoDb.Stores
 
             IMongoCollection<T> documentCollection = GetCollection<T>();
             totalRecords = documentCollection.AsQueryable().Where(predicate).Where(recordModePredicate).LongCount();
-            IQueryable<T> records = documentCollection.Get<T, string>(skip, take, predicate, recordMode, sortColumn, sortMode);
+            IQueryable<T> records = documentCollection.Get<T, string>(
+                skip,
+                take,
+                predicate,
+                recordMode,
+                sortColumn,
+                sortMode);
             PagedResult<T> result = null;
 
             if (records.HasAny())

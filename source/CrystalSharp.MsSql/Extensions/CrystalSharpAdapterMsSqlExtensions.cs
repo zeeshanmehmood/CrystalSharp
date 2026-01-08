@@ -29,8 +29,7 @@ namespace CrystalSharp.MsSql.Extensions
             params Type[] interceptors)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
 
             if (interceptors.HasAny())
             {
@@ -66,7 +65,7 @@ namespace CrystalSharp.MsSql.Extensions
 
         public static ICrystalSharpAdapter AddMsSqlEventStoreDb<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, MsSqlSettings settings)
         {
-            AddMsSqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterMsSqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Dbo).ToLower();
@@ -116,18 +115,26 @@ namespace CrystalSharp.MsSql.Extensions
                     }
                 }
 
-                options = options.UseSqlServer(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                if (interceptorsToRegister.HasAny())
+                {
+                    options = options.UseSqlServer(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                }
+                else
+                {
+                    options = options.UseSqlServer(settings.ConnectionString);
+                }
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MsSqlReadModelStore<TDbContext, TKey>>();
 
             return crystalSharpAdapter;
         }
 
-        public static ICrystalSharpAdapter AddMsSqlSagaStore(this ICrystalSharpAdapter crystalSharpAdapter,
+        public static ICrystalSharpAdapter AddMsSqlSagaStore(
+            this ICrystalSharpAdapter crystalSharpAdapter,
             MsSqlSettings settings,
             params Type[] types)
         {
-            AddMsSqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterMsSqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Dbo).ToLower();
@@ -149,9 +156,35 @@ namespace CrystalSharp.MsSql.Extensions
             }
         }
 
-        private static ICrystalSharpAdapter AddMsSqlDatabaseMigrator(ICrystalSharpAdapter crystalSharpAdapter)
+        private static void RegisterDefaultInterceptorsIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
         {
-            crystalSharpAdapter.ServiceCollection.TryAddTransient<IMsSqlDatabaseMigrator, MsSqlDatabaseMigrator>();
+            ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));
+            ServiceDescriptor dispatchDomainEventsInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DispatchDomainEventsInterceptor));
+
+            if (dateTractionInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DateTractionInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+            }
+
+            if (dispatchDomainEventsInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            }
+        }
+
+        private static ICrystalSharpAdapter RegisterMsSqlDatabaseMigratorIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
+        {
+            ServiceDescriptor databaseMigratorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(MsSqlDatabaseMigrator));
+
+            if (databaseMigratorDescriptor is null)
+            {
+                crystalSharpAdapter.ServiceCollection.TryAddTransient<IMsSqlDatabaseMigrator, MsSqlDatabaseMigrator>();
+            }
 
             return crystalSharpAdapter;
         }

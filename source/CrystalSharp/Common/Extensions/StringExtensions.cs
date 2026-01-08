@@ -12,7 +12,7 @@ namespace CrystalSharp.Common.Extensions
             {
                 bool isValid = true;
 
-                if (source == null || string.IsNullOrEmpty(source) || string.IsNullOrWhiteSpace(source))
+                if (source is null || string.IsNullOrEmpty(source) || string.IsNullOrWhiteSpace(source))
                 {
                     isValid = false;
                 }

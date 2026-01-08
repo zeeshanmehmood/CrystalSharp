@@ -191,8 +191,10 @@ namespace CrystalSharp.Messaging.AzureServiceBus
             await Send(channel, message.Body, message.Queue.Arguments, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task Send(string channel,
-            string body, IDictionary<string, object> customProperties,
+        private async Task Send(
+            string channel,
+            string body,
+            IDictionary<string, object> customProperties,
             CancellationToken cancellationToken = default)
         {
             ServiceBusSender serviceBusSender = _serviceBusClient.CreateSender(channel);

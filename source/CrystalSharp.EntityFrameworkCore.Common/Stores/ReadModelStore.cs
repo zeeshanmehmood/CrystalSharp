@@ -214,7 +214,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             return records;
         }
 
-        public virtual async Task<PagedResult<T>> Get<T>(int skip = 0,
+        public virtual async Task<PagedResult<T>> Get<T>(
+            int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
             bool tracking = false,
@@ -224,7 +225,16 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             CancellationToken cancellationToken = default)
             where T : class, IReadModel<TKey>
         {
-            PagedResult<T> result = await GetRecords(skip, take, predicate, tracking, recordMode, sortColumn, sortMode, cancellationToken).ConfigureAwait(false);
+            PagedResult<T> result = await GetRecords(
+                skip,
+                take,
+                predicate,
+                tracking,
+                recordMode,
+                sortColumn,
+                sortMode,
+                cancellationToken)
+                .ConfigureAwait(false);
 
             return result;
         }
@@ -401,7 +411,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             return affected;
         }
 
-        private async Task<PagedResult<T>> GetRecords<T>(int skip = 0,
+        private async Task<PagedResult<T>> GetRecords<T>(
+            int skip = 0,
             int take = 10,
             Expression<Func<T, bool>> predicate = null,
             bool tracking = false,
@@ -432,7 +443,14 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             }
 
             totalRecords = _dbContext.Set<T>().AsNoTracking().Where(predicate).Where(recordModePredicate).LongCount();
-            IQueryable<T> records = _dbContext.Get<T, TKey>(skip, take, predicate, tracking, recordMode, sortColumn, sortMode);
+            IQueryable<T> records = _dbContext.Get<T, TKey>(
+                skip,
+                take,
+                predicate,
+                tracking,
+                recordMode,
+                sortColumn,
+                sortMode);
             PagedResult<T> result = null;
 
             if (records.HasAny())

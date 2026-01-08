@@ -1,4 +1,5 @@
-﻿using CrystalSharp.Infrastructure;
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Infrastructure;
 using CrystalSharp.MsSql.Migrator;
 using CrystalSharp.Sagas;
 using CrystalSharp.Sql.Common.Extensions;
@@ -33,7 +34,7 @@ namespace CrystalSharp.MsSql.Stores
 
         private static string SelectSchema(string schema)
         {
-            return string.IsNullOrEmpty(schema) ? nameof(DbSchema.Dbo).ToLower() : schema;
+            return schema.IsValidString() ? schema : nameof(DbSchema.Dbo).ToLower();
         }
     }
 }

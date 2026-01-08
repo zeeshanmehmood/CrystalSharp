@@ -35,7 +35,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -394,7 +393,7 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
             crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
             {
                 List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
@@ -418,7 +417,7 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
             crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
             {
                 List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
@@ -442,7 +441,7 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
             crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
             {
                 List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
@@ -466,7 +465,7 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            RegisterDateTractionAndEventDispatcherInterceptors(crystalSharpAdapter);
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
             crystalSharpAdapter.ServiceCollection.AddDbContext<InMemoryDbContext>((sp, options) =>
             {
                 List<IInterceptor> interceptors = [sp.GetRequiredService<DateTractionInterceptor>(), sp.GetRequiredService<DispatchDomainEventsInterceptor>()];
@@ -510,7 +509,7 @@ namespace CrystalSharp.Tests.Common
             return Resolver.Resolve<T>();
         }
 
-        private void RegisterDateTractionAndEventDispatcherInterceptors(ICrystalSharpAdapter crystalSharpAdapter)
+        private void RegisterDefaultInterceptorsIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
         {
             ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
                 .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));

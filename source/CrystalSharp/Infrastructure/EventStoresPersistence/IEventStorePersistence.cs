@@ -13,12 +13,15 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             where TEvent : class;
         Task<TEvent> GetLastEvent<TEvent>(string stream, CancellationToken cancellationToken = default)
             where TEvent : class;
-        Task Store<TEvent>(string stream, IEnumerable<EventDataItem<TEvent>> eventsData,
+        Task Store<TEvent>(
+            string stream,
+            IEnumerable<EventDataItem<TEvent>> eventsData,
             long expectedVersion,
             CancellationToken cancellationToken = default)
             where TEvent : class;
         Task Delete(string stream, CancellationToken cancellationToken = default);
-        IEnumerable<EventDataItem<TEvent>> PrepareEventData<TEvent>(IEnumerable<TEvent> list,
+        IEnumerable<EventDataItem<TEvent>> PrepareEventData<TEvent>(
+            IEnumerable<TEvent> list,
             IDictionary<string, object> headers)
             where TEvent : class;
         string IdToStreamName(Type type, Guid id);

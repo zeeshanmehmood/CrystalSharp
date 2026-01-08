@@ -41,7 +41,9 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return aggregate;
         }
 
-        protected virtual async Task<TAggregate> GetAggregateByVersion<TAggregate>(Guid streamId, long version,
+        protected virtual async Task<TAggregate> GetAggregateByVersion<TAggregate>(
+            Guid streamId,
+            long version,
             TAggregate aggregate,
             CancellationToken cancellationToken = default)
             where TAggregate : IAggregateRoot<TKey>
@@ -118,7 +120,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return aggregate;
         }
 
-        public async Task<TAggregate> GetByVersion<TAggregate>(Guid streamId,
+        public async Task<TAggregate> GetByVersion<TAggregate>(
+            Guid streamId,
             long version,
             TAggregate aggregate,
             CancellationToken cancellationToken = default)
@@ -216,7 +219,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
             return _resolver.IsRegistered<ISnapshotStore>();
         }
 
-        private async Task<long> GetAggregateVersionFromSnapshot<TAggregate>(TAggregate aggregate,
+        private async Task<long> GetAggregateVersionFromSnapshot<TAggregate>(
+            TAggregate aggregate,
             Guid aggregateStreamId,
             CancellationToken cancellationToken = default)
             where TAggregate : IAggregateRoot<TKey>
@@ -228,7 +232,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence
                 if (IsSnapshotStoreRegistered())
                 {
                     ISnapshotStore snapshotStore = _resolver.Resolve<ISnapshotStore>();
-                    ISnapshot snapshot = await snapshotAggregateRoot.LoadSnapshot(snapshotStore,
+                    ISnapshot snapshot = await snapshotAggregateRoot.LoadSnapshot(
+                        snapshotStore,
                         aggregateStreamId,
                         cancellationToken)
                         .ConfigureAwait(false) as ISnapshot;

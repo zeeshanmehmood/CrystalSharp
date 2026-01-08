@@ -28,8 +28,7 @@ namespace CrystalSharp.MySql.Extensions
             params Type[] interceptors)
             where TDbContext : DbContext
         {
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
-            crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            RegisterDefaultInterceptorsIfRequired(crystalSharpAdapter);
 
             if (interceptors.HasAny())
             {
@@ -65,7 +64,7 @@ namespace CrystalSharp.MySql.Extensions
 
         public static ICrystalSharpAdapter AddMySqlEventStoreDb<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, MySqlSettings settings)
         {
-            AddMySqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterMySqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = false;
             string schema = string.Empty;
@@ -112,7 +111,14 @@ namespace CrystalSharp.MySql.Extensions
                     }
                 }
 
-                options = options.UseMySQL(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                if (interceptorsToRegister.HasAny())
+                {
+                    options = options.UseMySQL(settings.ConnectionString).AddInterceptors(interceptorsToRegister);
+                }
+                else
+                {
+                    options = options.UseMySQL(settings.ConnectionString);
+                }
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MySqlReadModelStore<TDbContext, TKey>>();
 
@@ -124,7 +130,7 @@ namespace CrystalSharp.MySql.Extensions
             MySqlSettings settings,
             params Type[] types)
         {
-            AddMySqlDatabaseMigrator(crystalSharpAdapter);
+            RegisterMySqlDatabaseMigratorIfRequired(crystalSharpAdapter);
 
             bool useSchema = false;
             string schema = string.Empty;
@@ -146,9 +152,35 @@ namespace CrystalSharp.MySql.Extensions
             }
         }
 
-        private static ICrystalSharpAdapter AddMySqlDatabaseMigrator(ICrystalSharpAdapter crystalSharpAdapter)
+        private static void RegisterDefaultInterceptorsIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
         {
-            crystalSharpAdapter.ServiceCollection.TryAddTransient<IMySqlDatabaseMigrator, MySqlDatabaseMigrator>();
+            ServiceDescriptor dateTractionInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DateTractionInterceptor));
+            ServiceDescriptor dispatchDomainEventsInterceptorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(DispatchDomainEventsInterceptor));
+
+            if (dateTractionInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DateTractionInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+            }
+
+            if (dispatchDomainEventsInterceptorDescriptor is null)
+            {
+                ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
+                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+            }
+        }
+
+        private static ICrystalSharpAdapter RegisterMySqlDatabaseMigratorIfRequired(ICrystalSharpAdapter crystalSharpAdapter)
+        {
+            ServiceDescriptor databaseMigratorDescriptor = crystalSharpAdapter.ServiceCollection
+                .SingleOrDefault(x => x.ImplementationType == typeof(MySqlDatabaseMigrator));
+
+            if (databaseMigratorDescriptor is null)
+            {
+                crystalSharpAdapter.ServiceCollection.TryAddTransient<IMySqlDatabaseMigrator, MySqlDatabaseMigrator>();
+            }
 
             return crystalSharpAdapter;
         }

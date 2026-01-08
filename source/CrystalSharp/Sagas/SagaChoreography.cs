@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace CrystalSharp.Sagas
 {
-    public abstract class SagaChoreography<TSagaLocator, TRequest>(ISagaStore sagaStore,
+    public abstract class SagaChoreography<TSagaLocator, TRequest>(
+        ISagaStore sagaStore,
         TSagaLocator sagaLocator,
         ISagaTransactionExecutor sagaTransactionExecutor) : SagaTransactionAssistant<TRequest>
         where TRequest : IRequest<SagaTransactionResult>
@@ -21,7 +22,8 @@ namespace CrystalSharp.Sagas
         private readonly TSagaLocator _sagaLocator = sagaLocator;
         private readonly ISagaTransactionExecutor _sagaTransactionExecutor = sagaTransactionExecutor;
 
-        protected async Task<SagaResult> Execute(ISagaTransaction transaction,
+        protected async Task<SagaResult> Execute(
+            ISagaTransaction transaction,
             Func<Task> compensation,
             CancellationToken cancellationToken = default)
         {
@@ -30,19 +32,22 @@ namespace CrystalSharp.Sagas
             return await Execute(correlationId, transaction, compensation, cancellationToken).ConfigureAwait(false);
         }
 
-        protected async Task<SagaResult> Execute(Guid correlationId,
+        protected async Task<SagaResult> Execute(
+            Guid correlationId,
             ISagaTransaction transaction,
             Func<Task> compensation,
             CancellationToken cancellationToken = default)
         {
             string sagaId = await _sagaLocator.Locate(correlationId);
-            SagaTransactionMeta sagaTransactionMeta = await GetSagaTransaction(_sagaStore,
+            SagaTransactionMeta sagaTransactionMeta = await GetSagaTransaction(
+                _sagaStore,
                 sagaId,
                 typeof(TRequest).Name,
                 transaction.GetType().Name,
                 cancellationToken)
                 .ConfigureAwait(false);
-            SagaTrail trailItem = await ExecuteTransaction(correlationId,
+            SagaTrail trailItem = await ExecuteTransaction(
+                correlationId,
                 sagaTransactionMeta,
                 transaction,
                 compensation,
@@ -80,7 +85,8 @@ namespace CrystalSharp.Sagas
             await Windup(_sagaStore, sagaId, success, errorTrail, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<SagaTrail> ExecuteTransaction(Guid correlationId,
+        private async Task<SagaTrail> ExecuteTransaction(
+            Guid correlationId,
             SagaTransactionMeta sagaTransactionMeta,
             ISagaTransaction transaction,
             Func<Task> compensation,

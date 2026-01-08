@@ -32,14 +32,16 @@ namespace CrystalSharp.Dapper.Common
             transaction.Rollback();
         }
 
-        public async Task<IEnumerable<T>> ExecuteQuery<T>(string query,
+        public async Task<IEnumerable<T>> ExecuteQuery<T>(
+            string query,
             IList<IDataParameter> parameters = null,
             IDbTransaction transaction = null)
         {
             return await ExecuteDbQuery<T>(query, false, parameters, transaction);
         }
 
-        public async Task<IEnumerable<T>> ExecuteStoredProcedure<T>(string storedProcedure,
+        public async Task<IEnumerable<T>> ExecuteStoredProcedure<T>(
+            string storedProcedure,
             IList<IDataParameter> parameters = null,
             IDbTransaction transaction = null)
         {
@@ -53,7 +55,8 @@ namespace CrystalSharp.Dapper.Common
             return await _dbConnection.ExecuteAsync(query, BuildParameters(parameters), transaction).ConfigureAwait(false);
         }
 
-        public async Task<object> ExecuteScalar(string query,
+        public async Task<object> ExecuteScalar(
+            string query,
             IList<IDataParameter> parameters = null,
             IDbTransaction transaction = null)
         {
@@ -79,13 +82,15 @@ namespace CrystalSharp.Dapper.Common
             return dataParameters;
         }
 
-        private async Task<IEnumerable<T>> ExecuteDbQuery<T>(string query,
+        private async Task<IEnumerable<T>> ExecuteDbQuery<T>(
+            string query,
             bool storedProcedure,
             IList<IDataParameter> parameters,
             IDbTransaction transaction = null)
         {
             CommandType commandType = storedProcedure ? CommandType.StoredProcedure : CommandType.Text;
-            IEnumerable<T> result = await _dbConnection.QueryAsync<T>(query,
+            IEnumerable<T> result = await _dbConnection.QueryAsync<T>(
+                query,
                 BuildParameters(parameters),
                 transaction,
                 commandType: commandType)

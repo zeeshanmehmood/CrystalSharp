@@ -1,4 +1,5 @@
-﻿using CrystalSharp.Common.Settings;
+﻿using CrystalSharp.Common.Extensions;
+using CrystalSharp.Common.Settings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -30,7 +31,7 @@ namespace CrystalSharp.Common.Serialization
 
         public static T Deserialize<T>(string json)
         {
-            if (string.IsNullOrEmpty(json))
+            if (!json.IsValidString())
             {
                 return default;
             }
@@ -40,7 +41,7 @@ namespace CrystalSharp.Common.Serialization
 
         public static object Deserialize(string json, Type type)
         {
-            if (string.IsNullOrEmpty(json))
+            if (!json.IsValidString())
             {
                 return new object();
             }

@@ -94,7 +94,7 @@ namespace CrystalSharp.MongoDb.Stores
 
             IDbSnapshotEntity dbSnapshotEntity = snapshots.FirstOrDefault();
 
-            if (dbSnapshotEntity != null)
+            if (dbSnapshotEntity is not null)
             {
                 snapshot = DeserializeSnapshot<TSnapshot>(dbSnapshotEntity.Data, dbSnapshotEntity.SnapshotAssembly);
             }
@@ -116,7 +116,7 @@ namespace CrystalSharp.MongoDb.Stores
                 .Limit(1)
                 .FirstOrDefault();
 
-            if (dbSnapshotEntity != null)
+            if (dbSnapshotEntity is not null)
             {
                 lastVersion = dbSnapshotEntity.SnapshotVersion;
             }

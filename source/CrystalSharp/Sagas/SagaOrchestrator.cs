@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace CrystalSharp.Sagas
 {
-    public abstract class SagaOrchestrator<TSagaLocator, TRequest>(IResolver resolver,
+    public abstract class SagaOrchestrator<TSagaLocator, TRequest>(
+        IResolver resolver,
         ISagaStore sagaStore,
         TSagaLocator sagaLocator) : SagaTransactionAssistant<TRequest>, ISagaOrchestrator<TSagaLocator, TRequest>
         where TSagaLocator : ISagaLocator
@@ -55,7 +56,7 @@ namespace CrystalSharp.Sagas
         {
             SagaActivityStore existingActivity = _activities.LastOrDefault();
 
-            if (existingActivity == null)
+            if (existingActivity is null)
             {
                 string errorMessage = "Cannot set compensation. There are no activities defined.";
 
@@ -106,13 +107,15 @@ namespace CrystalSharp.Sagas
                     }
                 }
 
-                SagaTransactionMeta sagaTransactionMeta = await GetSagaTransaction(_sagaStore,
+                SagaTransactionMeta sagaTransactionMeta = await GetSagaTransaction(
+                    _sagaStore,
                     sagaId,
                     typeof(TRequest).Name,
                     activity.ActivityName,
                     cancellationToken)
                     .ConfigureAwait(false);
-                SagaTrail trailItem = await ProcessActivity(sagaTransactionMeta,
+                SagaTrail trailItem = await ProcessActivity(
+                    sagaTransactionMeta,
                     context,
                     currentActivity,
                     cancellationToken)
@@ -132,9 +135,9 @@ namespace CrystalSharp.Sagas
             {
                 if (compensations.Any())
                 {
-                    _ = compensations.Reverse();
+                    IEnumerable<ISagaActivity> compensationActivities = compensations.Reverse();
 
-                    foreach (ISagaActivity compensationActivity in compensations)
+                    foreach (ISagaActivity compensationActivity in compensationActivities)
                     {
                         await compensationActivity.Execute(context, cancellationToken).ConfigureAwait(false);
                     }
@@ -155,7 +158,8 @@ namespace CrystalSharp.Sagas
             return sagaResult;
         }
 
-        private async Task<SagaTrail> ProcessActivity(SagaTransactionMeta sagaTransactionMeta,
+        private async Task<SagaTrail> ProcessActivity(
+            SagaTransactionMeta sagaTransactionMeta,
             SagaOrchestratorContext context,
             ISagaActivity activity,
             CancellationToken cancellationToken = default)

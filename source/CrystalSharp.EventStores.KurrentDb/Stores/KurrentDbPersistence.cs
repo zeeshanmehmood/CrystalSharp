@@ -30,7 +30,8 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
         {
             ValidateStreamVersion(stream, version);
 
-            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(Direction.Forwards,
+            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(
+                Direction.Forwards,
                 stream,
                 StreamPosition.FromStreamRevision(StreamPosition.FromInt64(version)),
                 cancellationToken: cancellationToken);
@@ -46,7 +47,8 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
         public async Task<TEvent> GetLastEvent<TEvent>(string stream, CancellationToken cancellationToken = default)
             where TEvent : class
         {
-            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(Direction.Backwards,
+            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(
+                Direction.Backwards,
                 stream,
                 StreamPosition.End,
                 cancellationToken: cancellationToken);
@@ -59,7 +61,9 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
             return DeserializeResolvedEvent<TEvent>(resolvedEvent);
         }
 
-        public async Task Store<TEvent>(string stream, IEnumerable<EventDataItem<TEvent>> eventsData,
+        public async Task Store<TEvent>(
+            string stream,
+            IEnumerable<EventDataItem<TEvent>> eventsData,
             long expectedVersion,
             CancellationToken cancellationToken = default)
             where TEvent : class
@@ -75,7 +79,8 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
 
             if (eventsToSave.HasAny())
             {
-                await _eventStore.AppendToStreamAsync(stream,
+                await _eventStore.AppendToStreamAsync(
+                    stream,
                     GetExpectedStream(expectedVersion),
                     eventsToSave,
                     cancellationToken: cancellationToken)
@@ -93,14 +98,16 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
             return originalVersion;
         }
 
-        private async Task<IEnumerable<TEvent>> ReadAllEvents<TEvent>(string stream,
+        private async Task<IEnumerable<TEvent>> ReadAllEvents<TEvent>(
+            string stream,
             long version,
             CancellationToken cancellationToken = default)
             where TEvent : class
         {
             ValidateStreamVersion(stream, version);
 
-            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(Direction.Forwards,
+            KurrentDBClient.ReadStreamResult readResult = _eventStore.ReadStreamAsync(
+                Direction.Forwards,
                 stream,
                 StreamPosition.Start,
                 cancellationToken: cancellationToken);
@@ -192,7 +199,7 @@ namespace CrystalSharp.EventStores.KurrentDb.Stores
             string json = ByteToJson(data);
             object @event = Serializer.Deserialize(json, Type.GetType(eventType));
 
-            if (@event as TEvent == null)
+            if (@event as TEvent is null)
             {
                 string eventTypeName = typeof(TEvent).FullName;
                 string errorMessage = $"The {eventTypeName} could not be deserialized as an event. Check the Payload property of this exception.";

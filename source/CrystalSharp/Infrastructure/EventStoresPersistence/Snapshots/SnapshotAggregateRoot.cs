@@ -51,7 +51,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots
             }
         }
 
-        public virtual async Task<object> LoadSnapshot(ISnapshotStore snapshotStore,
+        public virtual async Task<object> LoadSnapshot(
+            ISnapshotStore snapshotStore,
             Guid aggregateStreamId,
             CancellationToken cancellationToken = default)
         {
@@ -60,7 +61,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots
             return snapshot;
         }
 
-        public virtual async Task<object> CopySnapshotTo(ISnapshotStore snapshotStore,
+        public virtual async Task<object> CopySnapshotTo(
+            ISnapshotStore snapshotStore,
             Type aggregateRootType,
             CancellationToken cancellationToken = default)
         {
@@ -75,7 +77,8 @@ namespace CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots
             return copy;
         }
 
-        private async Task<TSnapshot> LoadSnapshotFromStore(ISnapshotStore snapshotStore,
+        private async Task<TSnapshot> LoadSnapshotFromStore(
+            ISnapshotStore snapshotStore,
             Guid aggregateStreamId,
             CancellationToken cancellationToken = default)
         {

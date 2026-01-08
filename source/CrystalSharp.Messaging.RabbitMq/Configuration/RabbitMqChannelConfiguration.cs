@@ -2,7 +2,8 @@
 
 namespace CrystalSharp.Messaging.RabbitMq.Configuration
 {
-    public class RabbitMqChannelConfiguration(bool publisherConfirmationsEnabled,
+    public class RabbitMqChannelConfiguration(
+        bool publisherConfirmationsEnabled,
         bool publisherConfirmationTrackingEnabled,
         RateLimiter outstandingPublisherConfirmationsRateLimiter = null,
         ushort? consumerDispatchConcurrency = 1)
