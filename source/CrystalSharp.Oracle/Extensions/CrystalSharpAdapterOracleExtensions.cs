@@ -28,7 +28,7 @@ namespace CrystalSharp.Oracle.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -66,7 +66,7 @@ namespace CrystalSharp.Oracle.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -96,8 +96,7 @@ namespace CrystalSharp.Oracle.Extensions
                     options = options.UseOracle(settings.ConnectionString);
                 }
             });
-
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, OracleReadModelStore<TDbContext, TKey>>();
+            crystalSharpAdapter.Register<IReadModelStore<TKey>, OracleReadModelStore<TDbContext, TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -122,13 +121,13 @@ namespace CrystalSharp.Oracle.Extensions
             if (dateTractionInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DateTractionInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+                crystalSharpAdapter.Register<DateTractionInterceptor>(ServiceLifetime.Singleton);
             }
 
             if (dispatchDomainEventsInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+                crystalSharpAdapter.Register<DispatchDomainEventsInterceptor>(ServiceLifetime.Singleton);
             }
         }
     }

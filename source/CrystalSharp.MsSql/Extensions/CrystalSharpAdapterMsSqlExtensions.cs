@@ -1,5 +1,4 @@
 ﻿using CrystalSharp.Common.Extensions;
-using CrystalSharp.Domain.EventDispatching;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors.Exceptions;
 using CrystalSharp.Infrastructure;
@@ -13,7 +12,6 @@ using CrystalSharp.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +34,7 @@ namespace CrystalSharp.MsSql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -70,15 +68,9 @@ namespace CrystalSharp.MsSql.Extensions
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Dbo).ToLower();
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s =>
-                new MsSqlEventStore(settings.ConnectionString,
-                    useSchema,
-                    schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new MsSqlSnapshotStore(settings.ConnectionString, useSchema, schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new MsSqlAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
-                s.GetRequiredService<IEventStorePersistence>(),
-                s.GetRequiredService<IEventDispatcher>()));
+            crystalSharpAdapter.Register<IEventStorePersistence>(s => { return new MsSqlEventStore(settings.ConnectionString, useSchema, schema);}, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<ISnapshotStore>(s => { return new MsSqlSnapshotStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IAggregateEventStore<TKey>, MsSqlAggregateEventStore<TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -94,7 +86,7 @@ namespace CrystalSharp.MsSql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -124,7 +116,7 @@ namespace CrystalSharp.MsSql.Extensions
                     options = options.UseSqlServer(settings.ConnectionString);
                 }
             });
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MsSqlReadModelStore<TDbContext, TKey>>();
+            crystalSharpAdapter.Register<IReadModelStore<TKey>, MsSqlReadModelStore<TDbContext, TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -141,7 +133,7 @@ namespace CrystalSharp.MsSql.Extensions
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             crystalSharpAdapter.RegisterSagas(assemblies);
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new MsSqlSagaStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.Register<ISagaStore>(s => { return new MsSqlSagaStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -166,13 +158,13 @@ namespace CrystalSharp.MsSql.Extensions
             if (dateTractionInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DateTractionInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+                crystalSharpAdapter.Register<DateTractionInterceptor>(ServiceLifetime.Singleton);
             }
 
             if (dispatchDomainEventsInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+                crystalSharpAdapter.Register<DispatchDomainEventsInterceptor>(ServiceLifetime.Singleton);
             }
         }
 
@@ -183,7 +175,7 @@ namespace CrystalSharp.MsSql.Extensions
 
             if (databaseMigratorDescriptor is null)
             {
-                crystalSharpAdapter.ServiceCollection.TryAddTransient<IMsSqlDatabaseMigrator, MsSqlDatabaseMigrator>();
+                crystalSharpAdapter.TryRegister<IMsSqlDatabaseMigrator, MsSqlDatabaseMigrator>(ServiceLifetime.Transient);
             }
 
             return crystalSharpAdapter;

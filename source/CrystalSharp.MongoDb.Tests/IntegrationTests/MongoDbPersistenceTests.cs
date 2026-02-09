@@ -5,7 +5,6 @@ using CrystalSharp.Tests.Common.MongoDb.Aggregates.ContactAggregate;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.MongoDb.Tests.IntegrationTests
@@ -23,8 +22,8 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             Contact contact = Contact.Create(new PersonDetails("Jack", "Smith"), "jack.smith@test.com");
 
             // Act
-            await sut.SaveChanges(contact, CancellationToken.None).ConfigureAwait(false);
-            Contact result = await sut.Find<Contact>(contact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Contact result = await sut.Find<Contact>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -38,8 +37,8 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             Contact contact = Contact.Create(new PersonDetails("Terry", "Dan"), "terry.dan@test.com");
 
             // Act
-            await sut.SaveChanges(contact, CancellationToken.None).ConfigureAwait(false);
-            Contact result = await sut.Find<Contact>(contact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Contact result = await sut.Find<Contact>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -56,13 +55,13 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IMongoDbContext sut = _testFixture.MongoDbContext;
             Contact contact = Contact.Create(new PersonDetails("Andy", "Williams"), "andy.williams@test.com");
-            await sut.SaveChanges(contact, CancellationToken.None).ConfigureAwait(false);
-            Contact existingContact = await sut.Find<Contact>(contact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Contact existingContact = await sut.Find<Contact>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             existingContact.Change(new PersonDetails("Robert", "Wilson"), "robert.wilson@test.com");
-            await sut.SaveChanges(existingContact, CancellationToken.None).ConfigureAwait(false);
-            Contact result = await sut.Find<Contact>(existingContact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(existingContact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Contact result = await sut.Find<Contact>(existingContact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -79,13 +78,13 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IMongoDbContext sut = _testFixture.MongoDbContext;
             Contact contact = Contact.Create(new PersonDetails("John", "Martin"), "john.martin@test.com");
-            await sut.SaveChanges(contact, CancellationToken.None).ConfigureAwait(false);
-            Contact existingContact = await sut.Find<Contact>(contact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Contact existingContact = await sut.Find<Contact>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             existingContact.Delete();
-            await sut.SaveChanges(existingContact, CancellationToken.None);
-            Contact result = await sut.Find<Contact>(existingContact.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(existingContact, TestContext.Current.CancellationToken);
+            Contact result = await sut.Find<Contact>(existingContact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.EntityStatus.Should().Be(EntityStatus.Deleted);
@@ -99,7 +98,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             Contact contact = Contact.Create(new PersonDetails("Ted", "Thomson"), "ted.thomson@test.com");
 
             // Act
-            await sut.SaveChanges(contact, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChanges(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Contact result = sut.Query<Contact>(x => x.Id == contact.Id).SingleOrDefault();
 
             // Assert

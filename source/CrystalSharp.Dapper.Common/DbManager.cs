@@ -48,7 +48,8 @@ namespace CrystalSharp.Dapper.Common
             return await ExecuteDbQuery<T>(storedProcedure, true, parameters, transaction);
         }
 
-        public async Task<int> ExecuteNonQuery(string query,
+        public async Task<int> ExecuteNonQuery(
+            string query,
             IList<IDataParameter> parameters = null,
             IDbTransaction transaction = null)
         {

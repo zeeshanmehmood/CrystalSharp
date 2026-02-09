@@ -35,6 +35,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -191,7 +192,11 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            return crystalSharpAdapter.AddKurrentDbEventStore<int>(eventStoreConnectionString).CreateResolver();
+            crystalSharpAdapter.AddKurrentDbEventStore<int>(eventStoreConnectionString);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMsSql(IConfigurationRoot configurationRoot)
@@ -203,13 +208,15 @@ namespace CrystalSharp.Tests.Common
             serviceCollection.AddScoped<IMsSqlDataContext>(s => s.GetRequiredService<MsSqlAppDbContext>());
 
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMsSql<MsSqlAppDbContext>(
+
+            crystalSharpAdapter.AddMsSql<MsSqlAppDbContext>(
                 msSqlSettings,
                 typeof(CurrencyNameValidatorInterceptor),
-                typeof(InvoiceCodeValidatorInterceptor))
-                .CreateResolver();
+                typeof(InvoiceCodeValidatorInterceptor));
 
-            return resolver;
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMsSqlEventStore(IConfigurationRoot configurationRoot)
@@ -218,7 +225,11 @@ namespace CrystalSharp.Tests.Common
             MsSqlSettings msSqlEventStoreSettings = new(eventStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMsSqlEventStoreDb<int>(msSqlEventStoreSettings).CreateResolver();
+
+            crystalSharpAdapter.AddMsSqlEventStoreDb<int>(msSqlEventStoreSettings);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IMsSqlDatabaseMigrator msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
 
             MsSqlEventStoreSetup.Run(msSqlDatabaseMigrator, msSqlEventStoreSettings.ConnectionString);
@@ -232,12 +243,14 @@ namespace CrystalSharp.Tests.Common
             MsSqlSettings msSqlReadModelStoreSettings = new(readModelStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMsSqlReadModelStore<MsSqlAppDbReadModelStoreContext, int>(
-                msSqlReadModelStoreSettings,
-                typeof(ProductValidatorInterceptor))
-                .CreateResolver();
 
-            return resolver;
+            crystalSharpAdapter.AddMsSqlReadModelStore<MsSqlAppDbReadModelStoreContext, int>(
+                msSqlReadModelStoreSettings,
+                typeof(ProductValidatorInterceptor));
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithOracle(IConfigurationRoot configurationRoot)
@@ -249,13 +262,15 @@ namespace CrystalSharp.Tests.Common
             serviceCollection.AddScoped<IOracleDataContext>(s => s.GetRequiredService<OracleAppDbContext>());
 
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddOracle<OracleAppDbContext>(
+
+            crystalSharpAdapter.AddOracle<OracleAppDbContext>(
                 oracleSettings,
                 typeof(EmployeeNameValidatorInterceptor),
-                typeof(SaleOrderCodeValidatorInterceptor))
-                .CreateResolver();
+                typeof(SaleOrderCodeValidatorInterceptor));
 
-            return resolver;
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithOracleReadModelStore(IConfigurationRoot configurationRoot)
@@ -264,12 +279,14 @@ namespace CrystalSharp.Tests.Common
             OracleSettings oracleReadModelStoreSettings = new(readModelStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddOracleReadModelStore<OracleAppDbReadModelStoreContext, int>(
-                oracleReadModelStoreSettings,
-                typeof(CustomerValidatorInterceptor))
-                .CreateResolver();
 
-            return resolver;
+            crystalSharpAdapter.AddOracleReadModelStore<OracleAppDbReadModelStoreContext, int>(
+                oracleReadModelStoreSettings,
+                typeof(CustomerValidatorInterceptor));
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithPostgreSql(IConfigurationRoot configurationRoot)
@@ -281,13 +298,15 @@ namespace CrystalSharp.Tests.Common
             serviceCollection.AddScoped<IPostgreSqlDataContext>(s => s.GetRequiredService<PostgreSqlAppDbContext>());
 
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddPostgreSql<PostgreSqlAppDbContext>(
+
+            crystalSharpAdapter.AddPostgreSql<PostgreSqlAppDbContext>(
                 postgreSqlSettings,
                 typeof(DepartmentNameValidatorInterceptor),
-                typeof(ReceiptCodeValidatorInterceptor))
-                .CreateResolver();
+                typeof(ReceiptCodeValidatorInterceptor));
 
-            return resolver;
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithPostgreSqlEventStore(IConfigurationRoot configurationRoot)
@@ -296,7 +315,11 @@ namespace CrystalSharp.Tests.Common
             PostgreSqlSettings postgreSqlEventStoreSettings = new(eventStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddPostgreSqlEventStoreDb<int>(postgreSqlEventStoreSettings).CreateResolver();
+            
+            crystalSharpAdapter.AddPostgreSqlEventStoreDb<int>(postgreSqlEventStoreSettings);
+            
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IPostgreSqlDatabaseMigrator postgreSqlDatabaseMigrator = resolver.Resolve<IPostgreSqlDatabaseMigrator>();
 
             PostgreSqlEventStoreSetup.Run(postgreSqlDatabaseMigrator, postgreSqlEventStoreSettings.ConnectionString);
@@ -310,12 +333,14 @@ namespace CrystalSharp.Tests.Common
             PostgreSqlSettings postgreSqlReadModelStoreSettings = new(readModelStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddPostgreSqlReadModelStore<PostgreSqlAppDbReadModelStoreContext, int>(
-                postgreSqlReadModelStoreSettings,
-                typeof(DepartmentValidatorInterceptor))
-                .CreateResolver();
 
-            return resolver;
+            crystalSharpAdapter.AddPostgreSqlReadModelStore<PostgreSqlAppDbReadModelStoreContext, int>(
+                postgreSqlReadModelStoreSettings,
+                typeof(DepartmentValidatorInterceptor));
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMySql(IConfigurationRoot configurationRoot)
@@ -327,13 +352,15 @@ namespace CrystalSharp.Tests.Common
             serviceCollection.AddScoped<IMySqlDataContext>(s => s.GetRequiredService<MySqlAppDbContext>());
 
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMySql<MySqlAppDbContext>(
+
+            crystalSharpAdapter.AddMySql<MySqlAppDbContext>(
                 mySqlSettings,
                 typeof(SupplierNameValidatorInterceptor),
-                typeof(PurchaseOrderCodeValidatorInterceptor))
-                .CreateResolver();
+                typeof(PurchaseOrderCodeValidatorInterceptor));
 
-            return resolver;
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMySqlEventStore(IConfigurationRoot configurationRoot)
@@ -342,7 +369,11 @@ namespace CrystalSharp.Tests.Common
             MySqlSettings mySqlEventStoreSettings = new(eventStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMySqlEventStoreDb<int>(mySqlEventStoreSettings).CreateResolver();
+
+            crystalSharpAdapter.AddMySqlEventStoreDb<int>(mySqlEventStoreSettings);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IMySqlDatabaseMigrator mySqlDatabaseMigrator = resolver.Resolve<IMySqlDatabaseMigrator>();
 
             MySqlEventStoreSetup.Run(mySqlDatabaseMigrator, mySqlEventStoreSettings.ConnectionString);
@@ -356,12 +387,14 @@ namespace CrystalSharp.Tests.Common
             MySqlSettings mySqlReadModelStoreSettings = new(readModelStoreConnectionString);
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
-            IResolver resolver = crystalSharpAdapter.AddMySqlReadModelStore<MySqlAppDbReadModelStoreContext, int>(
-                mySqlReadModelStoreSettings,
-                typeof(SupplierValidatorInterceptor))
-                .CreateResolver();
 
-            return resolver;
+            crystalSharpAdapter.AddMySqlReadModelStore<MySqlAppDbReadModelStoreContext, int>(
+                mySqlReadModelStoreSettings,
+                typeof(SupplierValidatorInterceptor));
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMongoDb(
@@ -380,10 +413,13 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            return crystalSharpAdapter.AddMongoDb(mongoDbSettings)
+            crystalSharpAdapter.AddMongoDb(mongoDbSettings)
                 .AddMongoDbEventStoreDb<string>(mongoDbEventStoreSettings)
-                .AddMongoDbReadModelStore(mongoDbReadModelStoreSettings)
-                .CreateResolver();
+                .AddMongoDbReadModelStore(mongoDbReadModelStoreSettings);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithMsSqlSagas(IConfigurationRoot configurationRoot)
@@ -401,8 +437,10 @@ namespace CrystalSharp.Tests.Common
                 options.UseInMemoryDatabase("crystalsharp-mssql-data-inmemory").AddInterceptors(interceptors);
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+            crystalSharpAdapter.AddMsSqlSagaStore(settings, typeof(PlaceOrderTransaction));
 
-            IResolver resolver = crystalSharpAdapter.AddMsSqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IMsSqlDatabaseMigrator msSqlDatabaseMigrator = resolver.Resolve<IMsSqlDatabaseMigrator>();
 
             MsSqlSagaStoreSetup.Run(msSqlDatabaseMigrator, settings.ConnectionString);
@@ -425,8 +463,10 @@ namespace CrystalSharp.Tests.Common
                 options.UseInMemoryDatabase("crystalsharp-postgresql-data-inmemory").AddInterceptors(interceptors);
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+            crystalSharpAdapter.AddPostgreSqlSagaStore(settings, typeof(PlaceOrderTransaction));
 
-            IResolver resolver = crystalSharpAdapter.AddPostgreSqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IPostgreSqlDatabaseMigrator postgreSqlDatabaseMigrator = resolver.Resolve<IPostgreSqlDatabaseMigrator>();
 
             PostgreSqlSagaStoreSetup.Run(postgreSqlDatabaseMigrator, settings.ConnectionString);
@@ -449,8 +489,10 @@ namespace CrystalSharp.Tests.Common
                 options.UseInMemoryDatabase("crystalsharp-mysql-data-inmemory").AddInterceptors(interceptors);
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+            crystalSharpAdapter.AddMySqlSagaStore(settings, typeof(PlaceOrderTransaction));
 
-            IResolver resolver = crystalSharpAdapter.AddMySqlSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+            IResolver resolver = serviceProvider.GetRequiredService<IResolver>();
             IMySqlDatabaseMigrator mySqlDatabaseMigrator = resolver.Resolve<IMySqlDatabaseMigrator>();
 
             MySqlSagaStoreSetup.Run(mySqlDatabaseMigrator, settings.ConnectionString);
@@ -473,8 +515,11 @@ namespace CrystalSharp.Tests.Common
                 options.UseInMemoryDatabase("crystalsharp-mongodb-data-inmemory").AddInterceptors(interceptors);
             });
             crystalSharpAdapter.ServiceCollection.AddScoped<IInMemoryDataContext>(s => s.GetRequiredService<InMemoryDbContext>());
+            crystalSharpAdapter.AddMongoDbSagaStore(settings, typeof(PlaceOrderTransaction));
 
-            return crystalSharpAdapter.AddMongoDbSagaStore(settings, typeof(PlaceOrderTransaction)).CreateResolver();
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithAzureServiceBus(IConfigurationRoot configurationRoot)
@@ -485,7 +530,11 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            return crystalSharpAdapter.AddAzureServiceBus(settings).CreateResolver();
+            crystalSharpAdapter.AddAzureServiceBus(settings);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected IResolver ConfigureServicesWithRabbitMq(IConfigurationRoot configurationRoot)
@@ -501,7 +550,11 @@ namespace CrystalSharp.Tests.Common
             IServiceCollection serviceCollection = new ServiceCollection();
             ICrystalSharpAdapter crystalSharpAdapter = ConfigureCrystalSharpAdapter(serviceCollection);
 
-            return crystalSharpAdapter.AddRabbitMq(settings).CreateResolver();
+            crystalSharpAdapter.AddRabbitMq(settings);
+
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
 
         protected T GetService<T>()

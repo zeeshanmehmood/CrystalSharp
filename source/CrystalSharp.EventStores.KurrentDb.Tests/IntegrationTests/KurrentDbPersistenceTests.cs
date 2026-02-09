@@ -6,7 +6,6 @@ using CrystalSharp.Tests.Common.EventStore.Aggregates.ProductAggregate;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
@@ -24,8 +23,8 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             Product product = Product.Create("Laptop", new ProductInfo("LP300", 300));
 
             // Act
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
-            Product result = await sut.Get<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Product result = await sut.Get<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeEquivalentTo(result, options => options.IncludingNestedObjects());
@@ -37,13 +36,13 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             // Arrange
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
             Product product = Product.Create("Juicer", new ProductInfo("JC50", 50));
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
-            Product existingProduct = await sut.Get<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Product existingProduct = await sut.Get<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             existingProduct.ChangeName("Blender");
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
-            Product result = await sut.Get<Product>(existingProduct.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Product result = await sut.Get<Product>(existingProduct.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Version.Should().Be(1);
@@ -55,17 +54,17 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             // Arrange
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
             Product product = Product.Create("Armchair", new ProductInfo("AC70", 270));
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
-            Product existingProduct = await sut.Get<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Product existingProduct = await sut.Get<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Desk Chair");
             existingProduct.ChangeProductInfo(new ProductInfo("DC20", 220));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Tulip Chair");
             existingProduct.ChangeProductInfo(new ProductInfo("TC10", 210));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            Product result = await sut.GetByVersion<Product>(existingProduct.GlobalUId, 2, CancellationToken.None).ConfigureAwait(false);
+            Product result = await sut.GetByVersion<Product>(existingProduct.GlobalUId, 2, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -83,28 +82,28 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             // Arrange
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
             Product product = Product.Create("Shelf", new ProductInfo("SH45", 445));
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
-            Product existingProduct = await sut.Get<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Product existingProduct = await sut.Get<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Book Shelf");
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeProductInfo(new ProductInfo("BS35", 435));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Classic Shelf");
             existingProduct.ChangeProductInfo(new ProductInfo("CS25", 425));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Classic Style Shelf");
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeProductInfo(new ProductInfo("CS15", 415));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeName("Old Style Shelf");
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeProductInfo(new ProductInfo("CS10", 410));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
             existingProduct.ChangeProductInfo(new ProductInfo("CS05", 405));
-            await sut.Store(existingProduct, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(existingProduct, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            Product result = await sut.Get<Product>(existingProduct.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            Product result = await sut.Get<Product>(existingProduct.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -123,10 +122,10 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             // Arrange
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
             Product product = Product.Create("LED Screen", new ProductInfo("LD55", 555));
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            Func<Task<Product>> result = async () => await sut.GetByVersion<Product>(product.GlobalUId, -1, CancellationToken.None).ConfigureAwait(false);
+            Func<Task<Product>> result = async () => await sut.GetByVersion<Product>(product.GlobalUId, -1, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             await result.Should().ThrowAsync<EventStoreNegativeVersionException>();
@@ -138,11 +137,11 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             // Arrange
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
             Product product = Product.Create("Floor Lamp", new ProductInfo("FL55", 155));
-            await sut.Store(product, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(product, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.Delete<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
-            Func<Task<Product>> result = async () => await sut.Get<Product>(product.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.Delete<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Func<Task<Product>> result = async () => await sut.Get<Product>(product.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             await result.Should().ThrowAsync<EventStoreStreamNotFoundException>();
@@ -155,7 +154,7 @@ namespace CrystalSharp.EventStores.KurrentDb.Tests.IntegrationTests
             IAggregateEventStore<int> sut = _testFixture.EventStorePersistence;
 
             // Act
-            Func<Task<Product>> result = async () => await sut.Get<Product>(Guid.Create(), CancellationToken.None).ConfigureAwait(false);
+            Func<Task<Product>> result = async () => await sut.Get<Product>(Guid.Create(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             await result.Should().ThrowAsync<EventStoreStreamNotFoundException>();

@@ -10,8 +10,8 @@ namespace CrystalSharp.Messaging.RabbitMq.Extensions
         {
             public ICrystalSharpAdapter AddRabbitMq(RabbitMqSettings settings, RabbitMqChannelConfiguration channelConfiguration = null)
             {
-                crystalSharpAdapter.ServiceCollection.AddScoped<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
-                crystalSharpAdapter.ServiceCollection.AddScoped<IMessageBroker>(s => 
+                crystalSharpAdapter.Register<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>(ServiceLifetime.Scoped);
+                crystalSharpAdapter.Register<IMessageBroker>(s => 
                 {
                     IRabbitMqConnectionFactory connectionFactory = s.GetRequiredService<IRabbitMqConnectionFactory>();
                     RabbitMqMessageBroker messageBroker = (channelConfiguration is null)
@@ -21,7 +21,8 @@ namespace CrystalSharp.Messaging.RabbitMq.Extensions
                     new RabbitMqMessageBroker(settings, channelConfiguration, connectionFactory);
 
                     return messageBroker;
-                });
+                },
+                ServiceLifetime.Scoped);
 
                 return crystalSharpAdapter;
             }

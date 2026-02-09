@@ -26,7 +26,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.PublishObject<Customer>(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.PublishObject<Customer>(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Exchange.Should().NotBeNull();
@@ -44,7 +44,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.PublishJson(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.PublishJson(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Exchange.Should().NotBeNull();
@@ -62,7 +62,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.PublishString(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.PublishString(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Exchange.Should().NotBeNull();
@@ -84,7 +84,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.SendObject<Customer>(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.SendObject<Customer>(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Should().NotBeNull();
@@ -102,7 +102,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.SendJson(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.SendJson(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Should().NotBeNull();
@@ -120,7 +120,7 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
             };
 
             // Act
-            await sut.SendString(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.SendString(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             message.Queue.Should().NotBeNull();
@@ -143,12 +143,12 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Tests.IntegrationTests
                 Queues = queues,
                 Action = m => { result = m; }
             };
-            await sut.SendString(message, CancellationToken.None).ConfigureAwait(false);
+            await sut.SendString(message, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.StartConsuming(consumer).ConfigureAwait(false);
+            await sut.StartConsuming(consumer, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Thread.Sleep(1000);
-            await sut.StopConsuming().ConfigureAwait(false);
+            await sut.StopConsuming(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().Be(message.Body);

@@ -2,6 +2,7 @@
 using CrystalSharp.Domain.EventDispatching;
 using CrystalSharp.Envoy.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -26,24 +27,139 @@ namespace CrystalSharp
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             ServiceCollection.AddEnvoy(assemblies);
-            ServiceCollection.AddScoped<IEventDispatcher, TransactionalDomainEventDispatcher>();
-            ServiceCollection.AddScoped<ICommandExecutor, CommandExecutor>();
-            ServiceCollection.AddScoped<IQueryExecutor, QueryExecutor>();
-            ServiceCollection.AddScoped<INotificationPublisher, NotificationPublisher>();
+            RegisterService<IEventDispatcher, TransactionalDomainEventDispatcher>(ServiceLifetime.Scoped, true);
+            RegisterService<ICommandExecutor, CommandExecutor>(ServiceLifetime.Scoped, true);
+            RegisterService<IQueryExecutor, QueryExecutor>(ServiceLifetime.Scoped, true);
+            RegisterService<INotificationPublisher, NotificationPublisher>(ServiceLifetime.Scoped, true);
 
             return this;
         }
 
-        public IResolver CreateResolver()
+        public void Register(Type serviceType, ServiceLifetime serviceLifetime)
         {
-            IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
+            RegisterService(serviceType, serviceLifetime, true);
+        }
 
-            return serviceProvider.GetService<IResolver>();
+        public void Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
+        {
+            RegisterService(serviceType, implementationType, serviceLifetime, true);
+        }
+
+        public void Register<TService>(ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService>(serviceLifetime, true);
+        }
+
+        public void Register<TService, TImplementation>(ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService, TImplementation>(serviceLifetime, true);
+        }
+
+        public void Register<TService>(Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService>(implementationFactory, serviceLifetime, true);
+        }
+
+        public void TryRegister(Type serviceType, ServiceLifetime serviceLifetime)
+        {
+            RegisterService(serviceType, serviceLifetime, false);
+        }
+
+        public void TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime)
+        {
+            RegisterService(serviceType, implementationType, serviceLifetime, false);
+        }
+
+        public void TryRegister<TService>(ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService>(serviceLifetime, false);
+        }
+
+        public void TryRegister<TService, TImplementation>(ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService, TImplementation>(serviceLifetime, false);
+        }
+
+        public void TryRegister<TService>(Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime)
+        {
+            RegisterService<TService>(implementationFactory, serviceLifetime, false);
         }
 
         private void RegisterDefaults(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<IResolver, ServiceResolver>();
+            RegisterService<IResolver, ServiceResolver>(ServiceLifetime.Scoped, true);
+        }
+
+        private void RegisterService(Type serviceType, ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            RegisterServiceWithLifetime(serviceType, serviceLifetime, overwrite);
+        }
+
+        private void RegisterService(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool overwrite = true)
+        {
+            RegisterServiceWithLifetime(serviceType, implementationType, serviceLifetime, overwrite);
+        }
+
+        private void RegisterService(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool overwrite = true)
+        {
+            RegisterServiceWithLifetime(serviceType, implementationFactory, serviceLifetime, overwrite);
+        }
+
+        private void RegisterService<TService>(ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            RegisterService(typeof(TService), serviceLifetime, overwrite);
+        }
+
+        private void RegisterService<TService, TImplementation>(ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            RegisterService(typeof(TService), typeof(TImplementation), serviceLifetime, overwrite);
+        }
+
+        private void RegisterService<TService>(Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            RegisterService(typeof(TService), implementationFactory, serviceLifetime, overwrite);
+        }
+
+        private void RegisterServiceWithLifetime(Type serviceType, ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            ServiceDescriptor serviceDescriptor = new(serviceType, serviceType, serviceLifetime);
+
+            if (overwrite)
+            {
+                ServiceCollection.Add(serviceDescriptor);
+            }
+            else
+            {
+                ServiceCollection.TryAdd(serviceDescriptor);
+            }
+        }
+
+        private void RegisterServiceWithLifetime(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            ServiceDescriptor serviceDescriptor = new(serviceType, implementationType, serviceLifetime);
+
+            if (overwrite)
+            {
+                ServiceCollection.Add(serviceDescriptor);
+            }
+            else
+            {
+                ServiceCollection.TryAdd(serviceDescriptor);
+            }
+        }
+
+        private void RegisterServiceWithLifetime(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool overwrite)
+        {
+            ServiceDescriptor serviceDescriptor = new(serviceType, implementationFactory, serviceLifetime);
+
+            if (overwrite)
+            {
+                ServiceCollection.Add(serviceDescriptor);
+            }
+            else
+            {
+                ServiceCollection.TryAdd(serviceDescriptor);
+            }
         }
     }
 }

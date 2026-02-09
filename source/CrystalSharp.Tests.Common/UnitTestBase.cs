@@ -1,5 +1,6 @@
 ﻿using CrystalSharp.Tests.Common.Envoy.Requests;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace CrystalSharp.Tests.Common
 {
@@ -12,9 +13,10 @@ namespace CrystalSharp.Tests.Common
 
         protected IResolver ConfigureCrystalSharpAdapter(IServiceCollection services)
         {
-            return CrystalSharpAdapter.New(services)
-                .AddCqrs(typeof(CreateProductRequest))
-                .CreateResolver();
+            ICrystalSharpAdapter crystalSharpAdapter = CrystalSharpAdapter.New(services).AddCqrs(typeof(CreateProductRequest));
+            IServiceProvider serviceProvider = crystalSharpAdapter.ServiceCollection.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IResolver>();
         }
     }
 }

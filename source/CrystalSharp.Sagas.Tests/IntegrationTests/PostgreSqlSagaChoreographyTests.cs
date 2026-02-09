@@ -7,7 +7,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.Sagas.Tests.IntegrationTests
@@ -26,9 +25,9 @@ namespace CrystalSharp.Sagas.Tests.IntegrationTests
             PlaceOrderTransaction transaction = new() { Product = "Chair", Quantity = 2, UnitPrice = 50, AmountPaid = 100 };
 
             // Act
-            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, CancellationToken.None).ConfigureAwait(false);
+            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Guid orderGlobalUId = sagaTransactionResult.CorrelationId;
-            Order result = await dataContext.Order.SingleOrDefaultAsync(x => x.GlobalUId == orderGlobalUId, CancellationToken.None).ConfigureAwait(false);
+            Order result = await dataContext.Order.SingleOrDefaultAsync(x => x.GlobalUId == orderGlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -48,9 +47,9 @@ namespace CrystalSharp.Sagas.Tests.IntegrationTests
             PlaceOrderTransaction transaction = new() { Product = "Laptop", Quantity = 1, UnitPrice = 450, AmountPaid = 400 };
 
             // Act
-            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, CancellationToken.None).ConfigureAwait(false);
+            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Guid orderGlobalUId = sagaTransactionResult.CorrelationId;
-            Order result = await dataContext.Order.SingleOrDefaultAsync(x => x.GlobalUId == orderGlobalUId, CancellationToken.None).ConfigureAwait(false);
+            Order result = await dataContext.Order.SingleOrDefaultAsync(x => x.GlobalUId == orderGlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

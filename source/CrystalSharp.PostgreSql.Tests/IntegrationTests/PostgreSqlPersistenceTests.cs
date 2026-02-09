@@ -7,7 +7,6 @@ using CrystalSharp.Tests.Common.PostgreSql.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
@@ -23,11 +22,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IPostgreSqlDataContext sut = _testFixture.DataContext;
             Department department = Department.Create("Information Technology", new DepartmentDetails("IT", "it.department@test.com"));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -39,11 +38,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IPostgreSqlDataContext sut = _testFixture.DataContext;
             Department department = Department.Create("Software Development", new DepartmentDetails("SD", "software.development.department@test.com"));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -60,14 +59,14 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IPostgreSqlDataContext sut = _testFixture.DataContext;
             Department department = Department.Create("Quality Control", new DepartmentDetails("QC", "quality.control.department@test.com"));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             department.ChangeName("Quality Assurance");
             department.ChangeDetails(new DepartmentDetails("QA", "qa.department@test.com"));
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -84,13 +83,13 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IPostgreSqlDataContext sut = _testFixture.DataContext;
             Department department = Department.Create("Hardware", new DepartmentDetails("HW", "hardware.department@test.com"));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             department.Delete();
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.EntityStatus.Should().Be(EntityStatus.Deleted);
@@ -102,11 +101,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IPostgreSqlDataContext sut = _testFixture.DataContext;
             Department department = Department.Create("Finance", new DepartmentDetails("FN", "finance.department@test.com"));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -124,13 +123,13 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             receipt.AddInventoryItem("Keyboard", 2, 73.52M);
             decimal amount = receipt.TotalAmount;
             receipt.Validate();
-            await sut.Receipt.AddAsync(receipt, CancellationToken.None).ConfigureAwait(false);
+            await sut.Receipt.AddAsync(receipt, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             Receipt result = await sut.Receipt
                 .Include(x => x.InventoryItems)
-                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert
@@ -152,11 +151,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             string departmentCode = "N/A";
             string departmentEmail = "sample.test@test.com";
             Department department = Department.Create(sampleDepartmentName, new DepartmentDetails(departmentCode, departmentEmail));
-            await sut.Department.AddAsync(department, CancellationToken.None).ConfigureAwait(false);
+            await sut.Department.AddAsync(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Department result = await sut.Department.SingleOrDefaultAsync(x => x.GlobalUId == department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Name.Should().Be(testDepartmentName);
@@ -172,13 +171,13 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             Receipt receipt = Receipt.Create(sampleReceiptCode);
             receipt.AddInventoryItem("Headset", 2, 20.25M);
             receipt.Validate();
-            await sut.Receipt.AddAsync(receipt, CancellationToken.None).ConfigureAwait(false);
+            await sut.Receipt.AddAsync(receipt, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             Receipt result = await sut.Receipt
                 .Include(x => x.InventoryItems)
-                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == receipt.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert

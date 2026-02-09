@@ -10,7 +10,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.Tests.UnitTests.Application
@@ -28,7 +27,7 @@ namespace CrystalSharp.Tests.UnitTests.Application
             ICommandExecutor commandExecutor = _fixture.CommandExecutor;
 
             // Act
-            CommandExecutionResult<CreateOrderResponse> result = await commandExecutor.Execute(command, CancellationToken.None).ConfigureAwait(false);
+            CommandExecutionResult<CreateOrderResponse> result = await commandExecutor.Execute(command, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -53,7 +52,7 @@ namespace CrystalSharp.Tests.UnitTests.Application
             IQueryExecutor queryExecutor = _fixture.QueryExecutor;
 
             // Act
-            QueryExecutionResult<NameReadModel> result = await queryExecutor.Execute(query, CancellationToken.None).ConfigureAwait(false);
+            QueryExecutionResult<NameReadModel> result = await queryExecutor.Execute(query, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -76,7 +75,7 @@ namespace CrystalSharp.Tests.UnitTests.Application
             IQueryExecutor queryExecutor = _fixture.QueryExecutor;
 
             // Act
-            QueryExecutionResult<IEnumerable<CustomerTypeReadModel>> result = await queryExecutor.Execute(query, CancellationToken.None).ConfigureAwait(false);
+            QueryExecutionResult<IEnumerable<CustomerTypeReadModel>> result = await queryExecutor.Execute(query, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -97,7 +96,7 @@ namespace CrystalSharp.Tests.UnitTests.Application
             INotificationPublisher notificationPublisher = _fixture.NotificationPublisher;
 
             // Act
-            await notificationPublisher.Publish(notification, CancellationToken.None).ConfigureAwait(false);
+            await notificationPublisher.Publish(notification, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             notification.Status.Should().Be(status);
@@ -112,7 +111,7 @@ namespace CrystalSharp.Tests.UnitTests.Application
             INotificationPublisher notificationPublisher = _fixture.NotificationPublisher;
 
             // Act
-            await notificationPublisher.Publish(notification, CancellationToken.None).ConfigureAwait(false);
+            await notificationPublisher.Publish(notification, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

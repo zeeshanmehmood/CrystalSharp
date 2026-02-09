@@ -6,7 +6,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.Sagas.Tests.IntegrationTests
@@ -37,9 +36,9 @@ namespace CrystalSharp.Sagas.Tests.IntegrationTests
             };
 
             // Act
-            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, CancellationToken.None).ConfigureAwait(false);
+            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Guid correlationId = sagaTransactionResult.CorrelationId;
-            Trip result = await dataContext.Trip.SingleOrDefaultAsync(x => x.CorrelationId == correlationId, CancellationToken.None).ConfigureAwait(false);
+            Trip result = await dataContext.Trip.SingleOrDefaultAsync(x => x.CorrelationId == correlationId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -74,9 +73,9 @@ namespace CrystalSharp.Sagas.Tests.IntegrationTests
             };
 
             // Act
-            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, CancellationToken.None).ConfigureAwait(false);
+            SagaTransactionResult sagaTransactionResult = await sut.Execute(transaction, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Guid correlationId = sagaTransactionResult.CorrelationId;
-            Trip result = await dataContext.Trip.SingleOrDefaultAsync(x => x.CorrelationId == correlationId, CancellationToken.None).ConfigureAwait(false);
+            Trip result = await dataContext.Trip.SingleOrDefaultAsync(x => x.CorrelationId == correlationId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

@@ -23,9 +23,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             where T : class, IReadModel<TKey>
         {
             await _dbContext.Set<T>().AddAsync(record, cancellationToken).ConfigureAwait(false);
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
 
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -36,9 +35,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             if (!records.HasAny()) return DefaultDbSettings.NoRecordsAffected;
 
             await _dbContext.Set<T>().AddRangeAsync(records, cancellationToken).ConfigureAwait(false);
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
 
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -47,9 +45,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             where T : class, IReadModel<TKey>
         {
             _dbContext.Set<T>().Update(record);
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
 
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -188,6 +185,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 await _dbContext.Set<T>().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false)
                 :
                 await _dbContext.Set<T>().AsNoTracking().SingleOrDefaultAsync(predicate, cancellationToken).ConfigureAwait(false);
+
             return existing;
         }
 
@@ -281,9 +279,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             if (existing is null) return DefaultDbSettings.NoRecordsAffected;
 
             _dbContext.Set<T>().Remove(existing);
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
 
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -297,10 +294,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             if (existing is null) return DefaultDbSettings.NoRecordsAffected;
 
             existing.EntityStatus = EntityStatus.Deleted;
-
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
-
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -326,9 +320,8 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             if (!existingRecords.HasAny()) return DefaultDbSettings.NoRecordsAffected;
 
             _dbContext.RemoveRange(existingRecords);
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
 
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -358,9 +351,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 record.EntityStatus = EntityStatus.Deleted;
             }
 
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
-
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -404,9 +395,7 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
                 record.EntityStatus = EntityStatus.Active;
             }
 
-            await SaveChanges(_dbContext, cancellationToken).ConfigureAwait(false);
-
-            int affected = GetAffected(_dbContext);
+            int affected = await SaveChanges(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }
@@ -482,20 +471,11 @@ namespace CrystalSharp.EntityFrameworkCore.Common.Stores
             }
         }
 
-        private async Task<int> SaveChanges(TDbContext dbContext, CancellationToken cancellationToken = default)
+        private async Task<int> SaveChanges(CancellationToken cancellationToken = default)
         {
-            DateTraction(dbContext);
+            DateTraction(_dbContext);
 
-            await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-            int affected = GetAffected(dbContext);
-
-            return affected;
-        }
-
-        private int GetAffected(TDbContext dbContext)
-        {
-            int affected = dbContext.ChangeTracker.Entries().Where(x => x.Entity is IReadModel<TKey>).Count();
+            int affected = await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return affected;
         }

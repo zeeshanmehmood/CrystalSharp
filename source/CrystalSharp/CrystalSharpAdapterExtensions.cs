@@ -1,7 +1,6 @@
 ﻿using CrystalSharp.Common.Extensions;
 using CrystalSharp.Sagas;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +32,7 @@ namespace CrystalSharp
                 {
                     foreach (Type sagaLocatorType in sagaLocatorTypes)
                     {
-                        crystalSharpAdapter.ServiceCollection.TryAddTransient(sagaLocatorType);
+                        crystalSharpAdapter.TryRegister(sagaLocatorType, ServiceLifetime.Transient);
                     }
                 }
 
@@ -41,7 +40,7 @@ namespace CrystalSharp
                 {
                     foreach (Type sagaType in sagaTypes)
                     {
-                        crystalSharpAdapter.ServiceCollection.TryAddTransient(sagaType);
+                        crystalSharpAdapter.TryRegister(sagaType, ServiceLifetime.Transient);
                     }
                 }
             }

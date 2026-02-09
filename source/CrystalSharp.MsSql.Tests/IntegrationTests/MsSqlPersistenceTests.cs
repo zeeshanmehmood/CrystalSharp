@@ -7,7 +7,6 @@ using CrystalSharp.Tests.Common.MsSql.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.MsSql.Tests.IntegrationTests
@@ -23,11 +22,11 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             // Arrange
             IMsSqlDataContext sut = _testFixture.DataContext;
             Currency currency = Currency.Create("United States dollar", new CurrencyDetails("USD", 840));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -39,11 +38,11 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             // Arrange
             IMsSqlDataContext sut = _testFixture.DataContext;
             Currency currency = Currency.Create("Pound sterling", new CurrencyDetails("GBP", 826));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -59,22 +58,22 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
         {
             // Arrange
             IMsSqlDataContext sut = _testFixture.DataContext;
-            Currency currency = Currency.Create("Hungarian forint", new CurrencyDetails("HUF", 348));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            Currency currency = Currency.Create("Bulgarian lev", new CurrencyDetails("BGN", 975));
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            currency.ChangeName("Pakistani rupee");
-            currency.ChangeDetails(new CurrencyDetails("PKR", 586));
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            currency.ChangeName("Euro");
+            currency.ChangeDetails(new CurrencyDetails("EUR", 978));
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
             {
-                result.Name.Should().Be("Pakistani rupee");
-                result.CurrencyDetails.Code.Should().Be("PKR");
-                result.CurrencyDetails.NumericCode.Should().Be(586);
+                result.Name.Should().Be("Euro");
+                result.CurrencyDetails.Code.Should().Be("EUR");
+                result.CurrencyDetails.NumericCode.Should().Be(978);
             }
         }
 
@@ -84,13 +83,13 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             // Arrange
             IMsSqlDataContext sut = _testFixture.DataContext;
             Currency currency = Currency.Create("Latvian lats", new CurrencyDetails("LVL", 111));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             currency.Delete();
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.EntityStatus.Should().Be(EntityStatus.Deleted);
@@ -101,12 +100,12 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
         {
             // Arrange
             IMsSqlDataContext sut = _testFixture.DataContext;
-            Currency currency = Currency.Create("Euro", new CurrencyDetails("EUR", 978));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            Currency currency = Currency.Create("Pakistani rupee", new CurrencyDetails("PKR", 586));
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -124,13 +123,13 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             invoice.AddLineItem("Keyboard", 2, 73.52M);
             decimal amount = invoice.TotalAmount;
             invoice.Validate();
-            await sut.Invoice.AddAsync(invoice, CancellationToken.None).ConfigureAwait(false);
+            await sut.Invoice.AddAsync(invoice, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             Invoice result = await sut.Invoice
                 .Include(x => x.LineItems)
-                .SingleOrDefaultAsync(y => y.GlobalUId == invoice.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == invoice.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert
@@ -152,11 +151,11 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             string currencyCode = "N/A";
             int currencyNumericCode = 1;
             Currency currency = Currency.Create(sampleCurrencyName, new CurrencyDetails(currencyCode, currencyNumericCode));
-            await sut.Currency.AddAsync(currency, CancellationToken.None).ConfigureAwait(false);
+            await sut.Currency.AddAsync(currency, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Currency result = await sut.Currency.SingleOrDefaultAsync(x => x.GlobalUId == currency.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Name.Should().Be(testCurrencyName);
@@ -172,13 +171,13 @@ namespace CrystalSharp.MsSql.Tests.IntegrationTests
             Invoice invoice = Invoice.Create(sampleInvoiceCode);
             invoice.AddLineItem("Headset", 5, 20.25M);
             invoice.Validate();
-            await sut.Invoice.AddAsync(invoice, CancellationToken.None).ConfigureAwait(false);
+            await sut.Invoice.AddAsync(invoice, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             Invoice result = await sut.Invoice
                 .Include(x => x.LineItems)
-                .SingleOrDefaultAsync(y => y.GlobalUId == invoice.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == invoice.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert

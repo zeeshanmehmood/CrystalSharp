@@ -5,7 +5,6 @@ using CrystalSharp.Tests.Common.Envoy.Requests;
 using CrystalSharp.Tests.Common.Envoy.Responses;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.Tests.UnitTests.Envoy
@@ -23,7 +22,7 @@ namespace CrystalSharp.Tests.UnitTests.Envoy
             IEnvoy envoy = _fixture.Envoy;
 
             // Act
-            CreateProductResponse result = await envoy.Send(request, CancellationToken.None).ConfigureAwait(false);
+            CreateProductResponse result = await envoy.Send(request, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -43,7 +42,7 @@ namespace CrystalSharp.Tests.UnitTests.Envoy
             IEnvoy envoy = _fixture.Envoy;
 
             // Act
-            await envoy.Publish(notification, CancellationToken.None).ConfigureAwait(false);
+            await envoy.Publish(notification, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             notification.Description.Should().Be(description);
@@ -58,7 +57,7 @@ namespace CrystalSharp.Tests.UnitTests.Envoy
             IEnvoy envoy = _fixture.Envoy;
 
             // Act
-            await envoy.Publish(notification, CancellationToken.None).ConfigureAwait(false);
+            await envoy.Publish(notification, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

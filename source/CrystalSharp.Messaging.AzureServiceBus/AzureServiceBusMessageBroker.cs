@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace CrystalSharp.Messaging.AzureServiceBus
 {
-    public sealed class AzureServiceBusMessageBroker : IMessageBroker, IDisposable, IAsyncDisposable
+    public class AzureServiceBusMessageBroker : IMessageBroker, IDisposable, IAsyncDisposable
     {
         private readonly AzureServiceBusSettings _azureServiceBusSettings;
         private readonly ServiceBusClient _serviceBusClient;

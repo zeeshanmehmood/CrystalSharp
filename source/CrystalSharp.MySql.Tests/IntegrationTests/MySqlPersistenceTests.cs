@@ -8,7 +8,6 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.MySql.Tests.IntegrationTests
@@ -24,11 +23,11 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             // Arrange
             IMySqlDataContext sut = _testFixture.DataContext;
             Supplier supplier = Supplier.Create("Falcon", new SupplierDetails("FLC", "falcon@test.com"));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -40,11 +39,11 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             // Arrange
             IMySqlDataContext sut = _testFixture.DataContext;
             Supplier supplier = Supplier.Create("Cosmos", new SupplierDetails("CMS", "cosmos@test.com"));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -61,14 +60,14 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             // Arrange
             IMySqlDataContext sut = _testFixture.DataContext;
             Supplier supplier = Supplier.Create("Three Star", new SupplierDetails("TSR", "three.star@test.com"));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             supplier.ChangeName("Eagle");
             supplier.ChangeDetails(new SupplierDetails("EGL", "eagle@test.com"));
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -85,13 +84,13 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             // Arrange
             IMySqlDataContext sut = _testFixture.DataContext;
             Supplier supplier = Supplier.Create("Sunshine", new SupplierDetails("SSH", "sunshine@test.com"));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             supplier.Delete();
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.EntityStatus.Should().Be(EntityStatus.Deleted);
@@ -103,11 +102,11 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             // Arrange
             IMySqlDataContext sut = _testFixture.DataContext;
             Supplier supplier = Supplier.Create("QQ North", new SupplierDetails("QQN", "qq.north@test.com"));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -125,13 +124,13 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             purchaseOrder.AddOrderItem("Keyboard", 2, 73.52M);
             decimal amount = purchaseOrder.TotalAmount;
             purchaseOrder.Validate();
-            await sut.PurchaseOrder.AddAsync(purchaseOrder, CancellationToken.None).ConfigureAwait(false);
+            await sut.PurchaseOrder.AddAsync(purchaseOrder, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             PurchaseOrder result = await sut.PurchaseOrder
                 .Include(x => x.OrderItems)
-                .SingleOrDefaultAsync(y => y.GlobalUId == purchaseOrder.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == purchaseOrder.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert
@@ -153,11 +152,11 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             string supplierCode = "N/A";
             string supplierEmail = "sample.test@test.com";
             Supplier supplier = Supplier.Create(sampleSupplierName, new SupplierDetails(supplierCode, supplierEmail));
-            await sut.Supplier.AddAsync(supplier, CancellationToken.None).ConfigureAwait(false);
+            await sut.Supplier.AddAsync(supplier, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Supplier result = await sut.Supplier.SingleOrDefaultAsync(x => x.GlobalUId == supplier.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Name.Should().Be(testSupplierName);
@@ -173,13 +172,13 @@ namespace CrystalSharp.MySql.Tests.IntegrationTests
             PurchaseOrder purchaseOrder = PurchaseOrder.Create(samplePurchaseOrderCode);
             purchaseOrder.AddOrderItem("Headset", 2, 20.25M);
             purchaseOrder.Validate();
-            await sut.PurchaseOrder.AddAsync(purchaseOrder, CancellationToken.None).ConfigureAwait(false);
+            await sut.PurchaseOrder.AddAsync(purchaseOrder, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             PurchaseOrder result = await sut.PurchaseOrder
                 .Include(x => x.OrderItems)
-                .SingleOrDefaultAsync(x => x.GlobalUId == purchaseOrder.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(x => x.GlobalUId == purchaseOrder.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert

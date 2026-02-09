@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace CrystalSharp.Messaging.RabbitMq
 {
-    public sealed class RabbitMqMessageBroker(RabbitMqSettings settings, IRabbitMqConnectionFactory connectionFactory) : IMessageBroker
+    public class RabbitMqMessageBroker(RabbitMqSettings settings, IRabbitMqConnectionFactory connectionFactory) : IMessageBroker
     {
         private readonly RabbitMqSettings _settings = settings;
         private readonly RabbitMqChannelConfiguration _channelConfiguration = null;

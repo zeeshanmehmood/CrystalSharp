@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrystalSharp.Tests.Common.Migrations.MySqlMigrations
 {
     [DbContext(typeof(MySqlAppDbReadModelStoreContext))]
-    [Migration("20251230100949_MySqlReadModelStoreInitTestingDb")]
+    [Migration("20260203085737_MySqlReadModelStoreInitTestingDb")]
     partial class MySqlReadModelStoreInitTestingDb
     {
         /// <inheritdoc />
@@ -19,7 +19,7 @@ namespace CrystalSharp.Tests.Common.Migrations.MySqlMigrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("CrystalSharp.Tests.Common.MySql.ReadModels.SupplierReadModel", b =>

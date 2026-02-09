@@ -1,5 +1,4 @@
 ﻿using CrystalSharp.Common.Extensions;
-using CrystalSharp.Domain.EventDispatching;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors.Exceptions;
 using CrystalSharp.Infrastructure;
@@ -13,7 +12,6 @@ using CrystalSharp.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +34,7 @@ namespace CrystalSharp.PostgreSql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -70,12 +68,13 @@ namespace CrystalSharp.PostgreSql.Extensions
             bool useSchema = settings.Schema.IsValidString();
             string schema = settings.Schema.IsValidString() ? settings.Schema : nameof(DbSchema.Public).ToLower();
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s => new PostgreSqlEventStore(settings.ConnectionString, useSchema, schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new PostgreSqlSnapshotStore(settings.ConnectionString, useSchema, schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new PostgreSqlAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
-                s.GetRequiredService<IEventStorePersistence>(),
-                s.GetRequiredService<IEventDispatcher>()));
+            crystalSharpAdapter.Register<IEventStorePersistence>(s =>
+            {
+                return new PostgreSqlEventStore(settings.ConnectionString, useSchema, schema);
+            },
+            ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<ISnapshotStore>(s => { return new PostgreSqlSnapshotStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IAggregateEventStore<TKey>, PostgreSqlAggregateEventStore<TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -91,7 +90,7 @@ namespace CrystalSharp.PostgreSql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -121,7 +120,7 @@ namespace CrystalSharp.PostgreSql.Extensions
                     options = options.UseNpgsql(settings.ConnectionString);
                 }
             });
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, PostgreSqlReadModelStore<TDbContext, TKey>>();
+            crystalSharpAdapter.Register<IReadModelStore<TKey>, PostgreSqlReadModelStore<TDbContext, TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -138,7 +137,7 @@ namespace CrystalSharp.PostgreSql.Extensions
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             crystalSharpAdapter.RegisterSagas(assemblies);
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new PostgreSqlSagaStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.Register<ISagaStore>(s => { return new PostgreSqlSagaStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -163,13 +162,13 @@ namespace CrystalSharp.PostgreSql.Extensions
             if (dateTractionInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DateTractionInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+                crystalSharpAdapter.Register<DateTractionInterceptor>(ServiceLifetime.Singleton);
             }
 
             if (dispatchDomainEventsInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+                crystalSharpAdapter.Register<DispatchDomainEventsInterceptor>(ServiceLifetime.Singleton);
             }
         }
 
@@ -180,7 +179,7 @@ namespace CrystalSharp.PostgreSql.Extensions
 
             if (databaseMigratorDescriptor is null)
             {
-                crystalSharpAdapter.ServiceCollection.TryAddTransient<IPostgreSqlDatabaseMigrator, PostgreSqlDatabaseMigrator>();
+                crystalSharpAdapter.TryRegister<IPostgreSqlDatabaseMigrator, PostgreSqlDatabaseMigrator>(ServiceLifetime.Transient);
             }
 
             return crystalSharpAdapter;

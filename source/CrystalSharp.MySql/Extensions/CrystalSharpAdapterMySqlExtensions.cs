@@ -1,5 +1,4 @@
 ﻿using CrystalSharp.Common.Extensions;
-using CrystalSharp.Domain.EventDispatching;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors;
 using CrystalSharp.EntityFrameworkCore.Common.Interceptors.Exceptions;
 using CrystalSharp.Infrastructure.EventStoresPersistence;
@@ -12,7 +11,6 @@ using CrystalSharp.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +33,7 @@ namespace CrystalSharp.MySql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -69,12 +67,9 @@ namespace CrystalSharp.MySql.Extensions
             bool useSchema = false;
             string schema = string.Empty;
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s => new MySqlEventStore(settings.ConnectionString, useSchema, schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new MySqlSnapshotStore(settings.ConnectionString, useSchema, schema));
-            crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new MySqlAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
-                s.GetRequiredService<IEventStorePersistence>(),
-                s.GetRequiredService<IEventDispatcher>()));
+            crystalSharpAdapter.Register<IEventStorePersistence>(s => { return new MySqlEventStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<ISnapshotStore>(s => { return new MySqlSnapshotStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IAggregateEventStore<TKey>, MySqlAggregateEventStore<TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -90,7 +85,7 @@ namespace CrystalSharp.MySql.Extensions
                 foreach (Type interceptor in interceptors)
                 {
                     ValidateDbInterceptor(interceptor);
-                    crystalSharpAdapter.ServiceCollection.AddSingleton(interceptor);
+                    crystalSharpAdapter.Register(interceptor, ServiceLifetime.Singleton);
                 }
             }
 
@@ -120,7 +115,7 @@ namespace CrystalSharp.MySql.Extensions
                     options = options.UseMySQL(settings.ConnectionString);
                 }
             });
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<TKey>, MySqlReadModelStore<TDbContext, TKey>>();
+            crystalSharpAdapter.Register<IReadModelStore<TKey>, MySqlReadModelStore<TDbContext, TKey>>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -137,7 +132,7 @@ namespace CrystalSharp.MySql.Extensions
             Assembly[] assemblies = [.. types.Select(t => t.Assembly)];
 
             crystalSharpAdapter.RegisterSagas(assemblies);
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore>(s => new MySqlSagaStore(settings.ConnectionString, useSchema, schema));
+            crystalSharpAdapter.Register<ISagaStore>(s => { return new MySqlSagaStore(settings.ConnectionString, useSchema, schema); }, ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -162,13 +157,13 @@ namespace CrystalSharp.MySql.Extensions
             if (dateTractionInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DateTractionInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DateTractionInterceptor>();
+                crystalSharpAdapter.Register<DateTractionInterceptor>(ServiceLifetime.Singleton);
             }
 
             if (dispatchDomainEventsInterceptorDescriptor is null)
             {
                 ValidateDbInterceptor(typeof(DispatchDomainEventsInterceptor));
-                crystalSharpAdapter.ServiceCollection.AddSingleton<DispatchDomainEventsInterceptor>();
+                crystalSharpAdapter.Register<DispatchDomainEventsInterceptor>(ServiceLifetime.Singleton);
             }
         }
 
@@ -179,7 +174,7 @@ namespace CrystalSharp.MySql.Extensions
 
             if (databaseMigratorDescriptor is null)
             {
-                crystalSharpAdapter.ServiceCollection.TryAddTransient<IMySqlDatabaseMigrator, MySqlDatabaseMigrator>();
+                crystalSharpAdapter.TryRegister<IMySqlDatabaseMigrator, MySqlDatabaseMigrator>(ServiceLifetime.Transient);
             }
 
             return crystalSharpAdapter;

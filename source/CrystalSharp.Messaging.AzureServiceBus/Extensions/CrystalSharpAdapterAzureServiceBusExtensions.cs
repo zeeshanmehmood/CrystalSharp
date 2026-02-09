@@ -8,7 +8,8 @@ namespace CrystalSharp.Messaging.AzureServiceBus.Extensions
     {
         public static ICrystalSharpAdapter AddAzureServiceBus(this ICrystalSharpAdapter crystalSharpAdapter, AzureServiceBusSettings settings)
         {
-            crystalSharpAdapter.ServiceCollection.AddScoped<IMessageBroker>(s => new AzureServiceBusMessageBroker(settings));
+            crystalSharpAdapter.Register<AzureServiceBusSettings>(s => settings, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IMessageBroker, AzureServiceBusMessageBroker>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }

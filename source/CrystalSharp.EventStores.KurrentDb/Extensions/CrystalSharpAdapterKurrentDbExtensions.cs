@@ -1,5 +1,4 @@
-﻿using CrystalSharp.Domain.EventDispatching;
-using CrystalSharp.EventStores.KurrentDb.Stores;
+﻿using CrystalSharp.EventStores.KurrentDb.Stores;
 using CrystalSharp.Infrastructure.EventStoresPersistence;
 using CrystalSharp.Infrastructure.EventStoresPersistence.Snapshots;
 using KurrentDB.Client;
@@ -12,31 +11,25 @@ namespace CrystalSharp.EventStores.KurrentDb.Extensions
         public static ICrystalSharpAdapter AddKurrentDbEventStore<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, string eventStoreConnectionString)
         {
             KurrentDBClientSettings clientSettings = KurrentDBClientSettings.Create(eventStoreConnectionString);
-            KurrentDBClient client = new(clientSettings);
 
-            RegisterEventStore<TKey>(crystalSharpAdapter, client);
+            AddKurrentDbEventStore<TKey>(crystalSharpAdapter, clientSettings);
 
             return crystalSharpAdapter;
         }
 
         public static ICrystalSharpAdapter AddKurrentDbEventStore<TKey>(this ICrystalSharpAdapter crystalSharpAdapter, KurrentDBClientSettings clientSettings)
         {
-            KurrentDBClient client = new(clientSettings);
-
-            RegisterEventStore<TKey>(crystalSharpAdapter, client);
+            RegisterEventStore<TKey>(crystalSharpAdapter, clientSettings);
 
             return crystalSharpAdapter;
         }
 
-        private static ICrystalSharpAdapter RegisterEventStore<TKey>(ICrystalSharpAdapter crystalSharpAdapter, KurrentDBClient client)
+        private static ICrystalSharpAdapter RegisterEventStore<TKey>(ICrystalSharpAdapter crystalSharpAdapter, KurrentDBClientSettings clientSettings)
         {
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s => new KurrentDbPersistence(client));
-            crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new KurrentDbAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
-                s.GetRequiredService<IEventStorePersistence>(),
-                s.GetRequiredService<IEventDispatcher>()));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s =>
-                new KurrentDbSnapshotStore(s.GetRequiredService<IEventStorePersistence>()));
+            crystalSharpAdapter.Register<KurrentDBClient>(s => { return new KurrentDBClient(clientSettings); }, ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IEventStorePersistence, KurrentDbPersistence>(ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<IAggregateEventStore<TKey>, KurrentDbAggregateEventStore<TKey>>(ServiceLifetime.Scoped);
+            crystalSharpAdapter.Register<ISnapshotStore, KurrentDbSnapshotStore>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }

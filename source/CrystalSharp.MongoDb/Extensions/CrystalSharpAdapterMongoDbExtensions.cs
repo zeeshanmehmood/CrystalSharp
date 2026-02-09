@@ -21,10 +21,11 @@ namespace CrystalSharp.MongoDb.Extensions
         public static ICrystalSharpAdapter AddMongoDb(this ICrystalSharpAdapter crystalSharpAdapter, MongoDbSettings settings)
         {
             RegisterBsonSerializerIfRequired();
-            crystalSharpAdapter.ServiceCollection.AddScoped<IMongoDbContext>(s => 
-                new MongoDbContext(settings.ConnectionString,
-                settings.Database,
-                s.GetRequiredService<IEventDispatcher>()));
+            crystalSharpAdapter.Register<IMongoDbContext>(s =>
+            {
+                return new MongoDbContext(settings.ConnectionString, settings.Database, s.GetRequiredService<IEventDispatcher>());
+            },
+            ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -34,12 +35,26 @@ namespace CrystalSharp.MongoDb.Extensions
             RegisterBsonSerializerIfRequired();
             MongoDbEventStoreSetup.Run(settings.ConnectionString, settings.Database);
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IEventStorePersistence>(s => new MongoDbEventStore(settings.ConnectionString, settings.Database));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISnapshotStore>(s => new MongoDbSnapshotStore(settings.ConnectionString, settings.Database));
-            crystalSharpAdapter.ServiceCollection.AddScoped<IAggregateEventStore<TKey>>(s =>
-                new MongoDbAggregateEventStore<TKey>(s.GetRequiredService<IResolver>(),
-                s.GetRequiredService<IEventStorePersistence>(),
-                s.GetRequiredService<IEventDispatcher>()));
+            crystalSharpAdapter.Register<IEventStorePersistence>(s => 
+            {
+                return new MongoDbEventStore(settings.ConnectionString, settings.Database);
+            },
+            ServiceLifetime.Scoped);
+            
+            crystalSharpAdapter.Register<ISnapshotStore>(s =>
+            {
+                return new MongoDbSnapshotStore(settings.ConnectionString, settings.Database);
+            },
+            ServiceLifetime.Scoped);
+
+            crystalSharpAdapter.Register<IAggregateEventStore<TKey>>(s =>
+            {
+                return new MongoDbAggregateEventStore<TKey>(
+                    s.GetRequiredService<IResolver>(),
+                    s.GetRequiredService<IEventStorePersistence>(),
+                    s.GetRequiredService<IEventDispatcher>());
+            },
+            ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -47,7 +62,11 @@ namespace CrystalSharp.MongoDb.Extensions
         public static ICrystalSharpAdapter AddMongoDbReadModelStore(this ICrystalSharpAdapter crystalSharpAdapter, MongoDbSettings settings)
         {
             RegisterBsonSerializerIfRequired();
-            crystalSharpAdapter.ServiceCollection.AddScoped<IReadModelStore<string>>(s => new MongoDbReadModelStore(settings.ConnectionString, settings.Database));
+            crystalSharpAdapter.Register<IReadModelStore<string>>(s =>
+            {
+                return new MongoDbReadModelStore(settings.ConnectionString, settings.Database);
+            },
+            ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }
@@ -62,8 +81,13 @@ namespace CrystalSharp.MongoDb.Extensions
 
             crystalSharpAdapter.RegisterSagas(assemblies);
 
-            crystalSharpAdapter.ServiceCollection.AddScoped<IMongoDbSagaContext>(s => new MongoDbSagaContext(settings.ConnectionString, settings.Database));
-            crystalSharpAdapter.ServiceCollection.AddScoped<ISagaStore, MongoDbSagaStore>();
+            crystalSharpAdapter.Register<IMongoDbSagaContext>(s =>
+            {
+                return new MongoDbSagaContext(settings.ConnectionString, settings.Database);
+            },
+            ServiceLifetime.Scoped);
+            
+            crystalSharpAdapter.Register<ISagaStore, MongoDbSagaStore>(ServiceLifetime.Scoped);
 
             return crystalSharpAdapter;
         }

@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
@@ -28,7 +27,7 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel department = DepartmentReadModel.Create("Information Technology", "IT");
 
             // Act
-            int result = await sut.Store(department).ConfigureAwait(false);
+            int result = await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -45,7 +44,7 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             IList<DepartmentReadModel> departments = [softwareDevelopment, qualityControl, qualityAssurance];
 
             // Act
-            int result = await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            int result = await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -57,11 +56,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Hardware", "HW");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
             department.Change("Finance", "FN");
 
             // Act
-            int result = await sut.Update(department).ConfigureAwait(false);
+            int result = await sut.Update(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -73,10 +72,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Management", "MGN");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Delete<DepartmentReadModel>(department.Id).ConfigureAwait(false);
+            int result = await sut.Delete<DepartmentReadModel>(department.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -88,10 +87,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Store Management", "SM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Delete<DepartmentReadModel>(department.GlobalUId).ConfigureAwait(false);
+            int result = await sut.Delete<DepartmentReadModel>(department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -103,10 +102,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Record Management", "RM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.SoftDelete<DepartmentReadModel>(department.Id).ConfigureAwait(false);
+            int result = await sut.SoftDelete<DepartmentReadModel>(department.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -118,10 +117,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Dispute Management", "DM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.SoftDelete<DepartmentReadModel>(department.GlobalUId).ConfigureAwait(false);
+            int result = await sut.SoftDelete<DepartmentReadModel>(department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -135,11 +134,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel foodManagement = DepartmentReadModel.Create("Food Management", "FM");
             DepartmentReadModel wasteManagement = DepartmentReadModel.Create("Waste Management", "WM");
             IList<DepartmentReadModel> departments = [foodManagement, wasteManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<int> recordsToDelete = departments.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -153,11 +152,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel generalManagement = DepartmentReadModel.Create("General Management", "GM");
             DepartmentReadModel advertisingManagement = DepartmentReadModel.Create("Advertising Management", "AD");
             IList<DepartmentReadModel> departments = [generalManagement, advertisingManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = departments.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -171,11 +170,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel salesManagement = DepartmentReadModel.Create("Sales Management", "SLM");
             DepartmentReadModel purchaseManagement = DepartmentReadModel.Create("Purchase Management", "PCM");
             IList<DepartmentReadModel> departments = [salesManagement, purchaseManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<int> recordsToDelete = departments.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -189,11 +188,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel transportManagement = DepartmentReadModel.Create("Transport Management", "TM");
             DepartmentReadModel canteenManagement = DepartmentReadModel.Create("Canteen Management", "CM");
             IList<DepartmentReadModel> departments = [transportManagement, canteenManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = departments.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -205,11 +204,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Production Management", "PDM");
-            await sut.Store<DepartmentReadModel>(department).ConfigureAwait(false);
-            await sut.SoftDelete<DepartmentReadModel>(department.Id).ConfigureAwait(false);
+            await sut.Store<DepartmentReadModel>(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SoftDelete<DepartmentReadModel>(department.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Restore<DepartmentReadModel>(department.Id).ConfigureAwait(false);
+            int result = await sut.Restore<DepartmentReadModel>(department.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -221,11 +220,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Marketing Management", "MM");
-            await sut.Store<DepartmentReadModel>(department).ConfigureAwait(false);
-            await sut.SoftDelete<DepartmentReadModel>(department.GlobalUId).ConfigureAwait(false);
+            await sut.Store<DepartmentReadModel>(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SoftDelete<DepartmentReadModel>(department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Restore<DepartmentReadModel>(department.GlobalUId).ConfigureAwait(false);
+            int result = await sut.Restore<DepartmentReadModel>(department.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -239,13 +238,13 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel inspectionManagement = DepartmentReadModel.Create("Inspection Management", "IM");
             DepartmentReadModel administrationManagement = DepartmentReadModel.Create("Administration Management", "AM");
             IList<DepartmentReadModel> departments = [inspectionManagement, administrationManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<int> recordsToDelete = departments.Select(x => x.Id);
-            await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<int> recordsToRestore = departments.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkRestore<DepartmentReadModel>(recordsToRestore).ConfigureAwait(false);
+            int result = await sut.BulkRestore<DepartmentReadModel>(recordsToRestore, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -259,13 +258,13 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel logisticsManagement = DepartmentReadModel.Create("Logistics Management", "LM");
             DepartmentReadModel assetManagement = DepartmentReadModel.Create("Asset Management", "ASM");
             IList<DepartmentReadModel> departments = [logisticsManagement, assetManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = departments.Select(x => x.GlobalUId);
-            await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete).ConfigureAwait(false);
+            await sut.BulkSoftDelete<DepartmentReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToRestore = departments.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkRestore<DepartmentReadModel>(recordsToRestore).ConfigureAwait(false);
+            int result = await sut.BulkRestore<DepartmentReadModel>(recordsToRestore, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -277,10 +276,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Operations Management", "OM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            long result = await sut.Count<DepartmentReadModel>().ConfigureAwait(false);
+            long result = await sut.Count<DepartmentReadModel>(cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -292,10 +291,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Risk Management", "RSM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.Id).ConfigureAwait(false);
+            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.Id, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -314,10 +313,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             // Arrange
             IReadModelStore<int> sut = _testFixture.ReadModelStore;
             DepartmentReadModel department = DepartmentReadModel.Create("Engineering Management", "EM");
-            await sut.Store(department).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.GlobalUId).ConfigureAwait(false);
+            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.GlobalUId, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -338,11 +337,11 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel salesAudit = DepartmentReadModel.Create("Audit - Sales", "AUDIT-SALES");
             DepartmentReadModel financeAudit = DepartmentReadModel.Create("Audit - Finance", "AUDIT-FINANCE");
             IList<DepartmentReadModel> departments = [salesAudit, financeAudit];
-            await sut.BulkStore<DepartmentReadModel>(departments, CancellationToken.None).ConfigureAwait(false);
+            await sut.BulkStore<DepartmentReadModel>(departments, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Expression<Func<DepartmentReadModel, bool>> predicate = x => x.Name.StartsWith("Audit") && x.EntityStatus == EntityStatus.Active;
 
             // Act
-            IQueryable<DepartmentReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+            IQueryable<DepartmentReadModel> result = await sut.Filter(predicate, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -362,10 +361,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel customerSupport = DepartmentReadModel.Create("Customer Support", "CS");
             DepartmentReadModel investorRelations = DepartmentReadModel.Create("Investor Relations", "IVR");
             IList<DepartmentReadModel> departments = [customerSupport, investorRelations];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10).ConfigureAwait(false);
+            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -388,10 +387,10 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel humanResourceManagement = DepartmentReadModel.Create("Human Resource Management", "HRM");
             DepartmentReadModel customerExperienceManagement = DepartmentReadModel.Create("Customer Experience Management", "CEM");
             IList<DepartmentReadModel> departments = [customerServiceManagement, humanResourceManagement, customerExperienceManagement];
-            await sut.BulkStore(departments.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(departments.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10, predicate, false, RecordMode.Active, "Name", DataSortMode.Descending, CancellationToken.None).ConfigureAwait(false);
+            PagedResult<DepartmentReadModel> result = await sut.Get<DepartmentReadModel>(0, 10, predicate, false, RecordMode.Active, "Name", DataSortMode.Descending, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -416,8 +415,8 @@ namespace CrystalSharp.PostgreSql.Tests.IntegrationTests
             DepartmentReadModel department = DepartmentReadModel.Create(sampleDepartmentName, sampleDepartmentCode);
 
             // Act
-            await sut.Store(department, CancellationToken.None).ConfigureAwait(false);
-            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.GlobalUId, false, CancellationToken.None).ConfigureAwait(false);
+            await sut.Store(department, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            DepartmentReadModel result = await sut.Find<DepartmentReadModel>(department.GlobalUId, false, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())

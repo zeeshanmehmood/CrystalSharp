@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.MongoDb.Tests.IntegrationTests
@@ -29,7 +28,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel contact = ContactReadModel.Create("Nancy", "Fuller", "nancy.fuller@test.com");
 
             // Act
-            int result = await sut.Store(contact).ConfigureAwait(false);
+            int result = await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -46,7 +45,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             IList<ContactReadModel> contacts = [firstContact, secondContact, thirdContact];
 
             // Act
-            int result = await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            int result = await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -58,11 +57,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Andrew", "Davolio", "andrew.davolio@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
             contact.Change("Janet", "Fuller", "janet.fuller@test.com");
 
             // Act
-            int result = await sut.Update(contact).ConfigureAwait(false);
+            int result = await sut.Update(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -74,10 +73,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Janet", "Davolio", "janet.davolio@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Delete<ContactReadModel>(contact.Id).ConfigureAwait(false);
+            int result = await sut.Delete<ContactReadModel>(contact.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -89,10 +88,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Nancy", "Leverling", "nancy.leverling@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Delete<ContactReadModel>(contact.GlobalUId).ConfigureAwait(false);
+            int result = await sut.Delete<ContactReadModel>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -104,10 +103,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Margaret", "Leverling", "margaret.leverling@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.SoftDelete<ContactReadModel>(contact.Id).ConfigureAwait(false);
+            int result = await sut.SoftDelete<ContactReadModel>(contact.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -119,10 +118,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Fuller", "Margaret", "fuller.margaret@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.SoftDelete<ContactReadModel>(contact.GlobalUId).ConfigureAwait(false);
+            int result = await sut.SoftDelete<ContactReadModel>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -136,11 +135,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Janet", "Andrew", "janet.andrew@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Margaret", "Davolio", "margaret.davolio@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<string> recordsToDelete = contacts.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -154,11 +153,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Andrew", "Steven", "andrew.steven@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Nancy", "Buchanan", "nancy.buchanan@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = contacts.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -172,11 +171,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Steven", "Leverling", "steven.leverling@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Janet", "Buchanan", "janet.buchanan@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<string> recordsToDelete = contacts.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -190,11 +189,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Steven", "Fuller", "steven.fuller@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Andrew", "Buchanan", "andrew.buchanan@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = contacts.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            int result = await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -206,11 +205,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Nancy", "Suyama", "nancy.suyama@test.com");
-            await sut.Store<ContactReadModel>(contact).ConfigureAwait(false);
-            await sut.SoftDelete<ContactReadModel>(contact.Id).ConfigureAwait(false);
+            await sut.Store<ContactReadModel>(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SoftDelete<ContactReadModel>(contact.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Restore<ContactReadModel>(contact.Id).ConfigureAwait(false);
+            int result = await sut.Restore<ContactReadModel>(contact.Id, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -222,11 +221,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Robert", "Fuller", "robert.fuller@test.com");
-            await sut.Store<ContactReadModel>(contact).ConfigureAwait(false);
-            await sut.SoftDelete<ContactReadModel>(contact.GlobalUId).ConfigureAwait(false);
+            await sut.Store<ContactReadModel>(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SoftDelete<ContactReadModel>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            int result = await sut.Restore<ContactReadModel>(contact.GlobalUId).ConfigureAwait(false);
+            int result = await sut.Restore<ContactReadModel>(contact.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -240,13 +239,13 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Andrew", "Robert", "andrew.robert@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Janet", "Suyama", "janet.suyama@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<string> recordsToDelete = contacts.Select(x => x.Id);
-            await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<string> recordsToRestore = contacts.Select(x => x.Id);
 
             // Act
-            int result = await sut.BulkRestore<ContactReadModel>(recordsToRestore).ConfigureAwait(false);
+            int result = await sut.BulkRestore<ContactReadModel>(recordsToRestore, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -260,13 +259,13 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Nancy", "Dodsworth", "nancy.dodsworth@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Laura", "Leverling", "laura.leverling@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToDelete = contacts.Select(x => x.GlobalUId);
-            await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete).ConfigureAwait(false);
+            await sut.BulkSoftDelete<ContactReadModel>(recordsToDelete, TestContext.Current.CancellationToken).ConfigureAwait(false);
             IEnumerable<Guid> recordsToRestore = contacts.Select(x => x.GlobalUId);
 
             // Act
-            int result = await sut.BulkRestore<ContactReadModel>(recordsToRestore).ConfigureAwait(false);
+            int result = await sut.BulkRestore<ContactReadModel>(recordsToRestore, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -278,10 +277,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Suyama", "Davolio", "suyama.davolio@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            long result = await sut.Count<ContactReadModel>().ConfigureAwait(false);
+            long result = await sut.Count<ContactReadModel>(cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().BeGreaterThan(0);
@@ -293,10 +292,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Robert", "Leverling", "robert.leverling@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            ContactReadModel result = await sut.Find<ContactReadModel>(contact.Id).ConfigureAwait(false);
+            ContactReadModel result = await sut.Find<ContactReadModel>(contact.Id, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -316,10 +315,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             // Arrange
             IReadModelStore<string> sut = _testFixture.ReadModelStore;
             ContactReadModel contact = ContactReadModel.Create("Margaret", "Suyama", "margaret.suyama@test.com");
-            await sut.Store(contact).ConfigureAwait(false);
+            await sut.Store(contact, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            ContactReadModel result = await sut.Find<ContactReadModel>(contact.GlobalUId).ConfigureAwait(false);
+            ContactReadModel result = await sut.Find<ContactReadModel>(contact.GlobalUId, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -342,11 +341,11 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("George", "Andrew", $"george.andrew.{randomEmailKey}@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("George", "Dan", $"george.dan.{randomEmailKey}@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore(contacts, CancellationToken.None).ConfigureAwait(false);
+            await sut.BulkStore(contacts, TestContext.Current.CancellationToken).ConfigureAwait(false);
             Expression<Func<ContactReadModel, bool>> predicate = x => x.Email.Contains(randomEmailKey) && x.EntityStatus == EntityStatus.Active;
 
             // Act
-            IQueryable<ContactReadModel> result = await sut.Filter(predicate).ConfigureAwait(false);
+            IQueryable<ContactReadModel> result = await sut.Filter(predicate, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -366,10 +365,10 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel firstContact = ContactReadModel.Create("Andrew", "Callahan", "andrew.callahan@test.com");
             ContactReadModel secondContact = ContactReadModel.Create("Robert", "Buchanan", "robert.buchanan@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact];
-            await sut.BulkStore<ContactReadModel>(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore<ContactReadModel>(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            PagedResult<ContactReadModel> result = await sut.Get<ContactReadModel>(0, 10).ConfigureAwait(false);
+            PagedResult<ContactReadModel> result = await sut.Get<ContactReadModel>(0, 10, cancellationToken: TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -392,7 +391,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
             ContactReadModel secondContact = ContactReadModel.Create("Steven", "Callahan", "steven.callahan@test.com");
             ContactReadModel thirdContact = ContactReadModel.Create("John", "Webbs", "john.webbs@test.com");
             IList<ContactReadModel> contacts = [firstContact, secondContact, thirdContact];
-            await sut.BulkStore<ContactReadModel>(contacts.AsEnumerable()).ConfigureAwait(false);
+            await sut.BulkStore<ContactReadModel>(contacts.AsEnumerable(), TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             PagedResult<ContactReadModel> result = await sut.Get<ContactReadModel>(
@@ -403,7 +402,7 @@ namespace CrystalSharp.MongoDb.Tests.IntegrationTests
                 RecordMode.Active,
                 "FirstName",
                 DataSortMode.Ascending,
-                CancellationToken.None)
+                TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert

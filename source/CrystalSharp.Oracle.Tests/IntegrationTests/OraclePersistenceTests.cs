@@ -7,7 +7,6 @@ using CrystalSharp.Tests.Common.Oracle.Infrastructure;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrystalSharp.Oracle.Tests.IntegrationTests
@@ -23,11 +22,11 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             // Arrange
             IOracleDataContext sut = _testFixture.DataContext;
             Employee employee = Employee.Create("Sylvester Webb", "SLW");
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -39,11 +38,11 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             // Arrange
             IOracleDataContext sut = _testFixture.DataContext;
             Employee employee = Employee.Create("Mark Anthony", "MRA");
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -59,13 +58,13 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             // Arrange
             IOracleDataContext sut = _testFixture.DataContext;
             Employee employee = Employee.Create("Jack Wayne", "JWY");
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             employee.Change("Dan Thomas", "DTM");
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             using (new AssertionScope())
@@ -81,13 +80,13 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             // Arrange
             IOracleDataContext sut = _testFixture.DataContext;
             Employee employee = Employee.Create("Trevor Anderson", "TAD");
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
             employee.Delete();
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.EntityStatus.Should().Be(EntityStatus.Deleted);
@@ -99,11 +98,11 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             // Arrange
             IOracleDataContext sut = _testFixture.DataContext;
             Employee employee = Employee.Create("Ron Christopher", "RCS");
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Should().NotBeNull();
@@ -121,13 +120,13 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             saleOrder.AddOrderDetail("Keyboard", 2, 73.52M);
             decimal amount = saleOrder.TotalAmount;
             saleOrder.Validate();
-            await sut.SaleOrder.AddAsync(saleOrder, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaleOrder.AddAsync(saleOrder, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             SaleOrder result = await sut.SaleOrder
                 .Include(x => x.Orders)
-                .SingleOrDefaultAsync(y => y.GlobalUId == saleOrder.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == saleOrder.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert
@@ -148,11 +147,11 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             string testEmployeeName = Employee.GetTestEmployeeName();
             string employeeCode = "N/A";
             Employee employee = Employee.Create(sampleEmployeeName, employeeCode);
-            await sut.Employee.AddAsync(employee, CancellationToken.None).ConfigureAwait(false);
+            await sut.Employee.AddAsync(employee, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
+            Employee result = await sut.Employee.SingleOrDefaultAsync(x => x.GlobalUId == employee.GlobalUId, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Assert
             result.Name.Should().Be(testEmployeeName);
@@ -168,13 +167,13 @@ namespace CrystalSharp.Oracle.Tests.IntegrationTests
             SaleOrder saleOrder = SaleOrder.Create(sampleSaleOrderCode);
             saleOrder.AddOrderDetail("Headset", 2, 20.25M);
             saleOrder.Validate();
-            await sut.SaleOrder.AddAsync(saleOrder, CancellationToken.None).ConfigureAwait(false);
+            await sut.SaleOrder.AddAsync(saleOrder, TestContext.Current.CancellationToken).ConfigureAwait(false);
 
             // Act
-            await sut.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await sut.SaveChangesAsync(TestContext.Current.CancellationToken).ConfigureAwait(false);
             SaleOrder result = await sut.SaleOrder
                 .Include(x => x.Orders)
-                .SingleOrDefaultAsync(y => y.GlobalUId == saleOrder.GlobalUId, CancellationToken.None)
+                .SingleOrDefaultAsync(y => y.GlobalUId == saleOrder.GlobalUId, TestContext.Current.CancellationToken)
                 .ConfigureAwait(false);
 
             // Assert
